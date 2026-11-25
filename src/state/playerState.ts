@@ -10,6 +10,8 @@ export const playerState = {
   position: new Vector3(...CONFIG.player.spawn),
   velocity: new Vector3(),
   grounded: false,
+  /** True while a heavy water column is pressing on the player. */
+  inColumn: false,
   surface: 'default' as SurfaceType,
   /** The player's physics body, so camera rays can ignore it. */
   body: null as RapierRigidBody | null,

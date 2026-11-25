@@ -68,6 +68,37 @@ export const GREYBOX_BLOCKS: Block[] = [
   },
 ]
 
+/** The main falling sheet, hung just in front of the cliff face. */
+export const WATERFALL = {
+  width: 12,
+  topY: topY + 1.6,
+  bottomY: CONFIG.level.waterY,
+  /** Z of the sheet's top edge, just clear of the summit's front. */
+  z: -2.4,
+}
+
+export interface WaterColumn {
+  x: number
+  z: number
+  topY: number
+  bottomY: number
+}
+
+/** A column pours from the underside of the ledge four above onto `lower`. */
+function columnOnto(lowerIndex: number): WaterColumn {
+  const lower = ledges[lowerIndex]
+  const upper = ledges[lowerIndex + 4]
+  const outward = Math.sign(lower.position[0])
+  return {
+    x: lower.position[0] + outward * (lower.size[0] / 2 - CONFIG.waterColumn.radius + 0.1),
+    z: lower.position[2] + 0.2,
+    topY: upper.position[1] - upper.size[1] / 2,
+    bottomY: lower.position[1] + lower.size[1] / 2,
+  }
+}
+
+export const WATER_COLUMNS: WaterColumn[] = [columnOnto(5), columnOnto(9)]
+
 /** Pool water rectangle, between the shore and the cliff face. */
 export const POOL = { center: [0, CONFIG.level.waterY, 0.5] as Vec3, size: [26, 7] as [number, number] }
 

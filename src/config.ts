@@ -74,4 +74,56 @@ export const CONFIG = {
     splashDuration: 0.7,
     splashRadius: 2.6,
   },
+  /** Directional light position; the pool glint uses the same direction. */
+  sunPosition: [12, 30, 14] as Vec3,
+  /** Starting values for the waterfall shader; live-tunable in leva (dev only). */
+  waterfall: {
+    speed: 1.3,
+    color: '#8fd0e6',
+    deepColor: '#2f7fa6',
+    foam: 0.75,
+    opacity: 0.8,
+    /** Vertex ripple depth in metres. */
+    wobble: 0.14,
+    /** How far the middle of the sheet bulges out from the cliff. */
+    bulge: 0.35,
+    /** How far the bottom of the sheet has drifted out from the top. */
+    lean: 0.7,
+  },
+  /** Heavy columns of water that shove the player around. */
+  waterColumn: {
+    radius: 0.55,
+    /** Downward acceleration while inside, m/s². */
+    push: 22,
+    /** Speed the column carries the player away from the cliff, m/s. */
+    drift: 2.5,
+    /** Jump speed is multiplied by this while inside. */
+    jumpMultiplier: 0.75,
+  },
+  pool: {
+    shallowColor: '#4f9db8',
+    deepColor: '#1d5673',
+    skyColor: '#cfe2ec',
+    rippleStrength: 0.16,
+  },
+  mist: {
+    count: 36,
+    color: '#eef6f9',
+    opacity: 0.16,
+    minSize: 4,
+    maxSize: 9,
+  },
+  spray: {
+    /** Size of the shared particle pool. */
+    count: 280,
+    /** Particles per second per metre along the base of the fall. */
+    baseRate: 9,
+    /** Particles per second at the foot of each water column. */
+    columnRate: 22,
+    gravity: -12,
+    size: 0.07,
+    /** Particles thrown up when landing on wet stone / falling in the pool. */
+    landingBurst: 14,
+    poolBurst: 40,
+  },
 } as const

@@ -5,11 +5,13 @@ import { CapsuleCollider, RigidBody, useRapier, type RapierRigidBody } from '@re
 import { Vector3, type Group } from 'three'
 import { CONFIG, type Vec3 } from '../config'
 import type { Control } from '../input/controls'
-import { RESPAWN_POINTS, type BlockData } from '../level/greybox'
+import { RESPAWN_POINTS, WATER_COLUMNS, type BlockData } from '../level/greybox'
+import { emitSpray } from '../state/effects'
 import { useGameStore } from '../state/gameStore'
 import { playerState } from '../state/playerState'
 
 const P = CONFIG.player
+const COLUMN = CONFIG.waterColumn
 const FOOT_OFFSET = P.halfHeight + P.radius
 /** Ground rays: centre plus four around the capsule so ledge edges still count. */
 const RAY_OFFSETS: [number, number][] = [
@@ -111,6 +113,11 @@ export function Player() {
       const over = impact - CONFIG.camera.shakeThreshold
       if (over > 0) playerState.shake = Math.min(CONFIG.camera.shakeMax, over * 0.05)
       m.jumping = false
+      // Wet stone throws up spray underfoot.
+      if (ground.surface === 'wet') {
+        const p = rb.translation()
+        emitSpray(p.x, p.y - FOOT_OFFSET, p.z, CONFIG.spray.landingBurst, 1.5 + impact * 0.15)
+      }
     }
 
     if (ground) {
@@ -131,17 +138,28 @@ export function Player() {
     if (wish.lengthSq() > 0) game.startRun()
     wish.multiplyScalar(keys.sprint ? P.sprintSpeed : P.runSpeed)
 
+    // Heavy water columns carry the player away from the cliff and press down.
+    const here = rb.translation()
+    const inColumn = WATER_COLUMNS.some(
+      (c) =>
+        here.y - FOOT_OFFSET < c.topY &&
+        here.y + FOOT_OFFSET > c.bottomY &&
+        Math.hypot(here.x - c.x, here.z - c.z) < COLUMN.radius + P.radius * 0.5,
+    )
+    if (inColumn) wish.z += COLUMN.drift
+
     // Slippery surfaces brake slowly, so the player slides.
     const handling = ground ? CONFIG.surfaces[ground.surface] : AIR_HANDLING
     const vx = approach(vel.x, wish.x, handling.accel, handling.brake, dt)
     const vz = approach(vel.z, wish.z, handling.accel, handling.brake, dt)
     let vy = vel.y
+    if (inColumn) vy -= COLUMN.push * dt
 
     // Coyote time and jump buffering.
     m.coyote = grounded ? P.coyoteTime : Math.max(0, m.coyote - dt)
     m.buffer = keys.jump && !m.jumpHeld ? P.jumpBuffer : Math.max(0, m.buffer - dt)
     if (m.buffer > 0 && m.coyote > 0) {
-      vy = P.jumpSpeed
+      vy = P.jumpSpeed * (inColumn ? COLUMN.jumpMultiplier : 1)
       m.buffer = m.coyote = 0
       m.jumping = true
       game.startRun()
@@ -163,6 +181,7 @@ export function Player() {
     if (inPool || pos.y < CONFIG.level.killY) {
       playerState.splash.position.set(pos.x, CONFIG.level.waterY, pos.z)
       playerState.splash.id += 1
+      emitSpray(pos.x, CONFIG.level.waterY, pos.z, CONFIG.spray.poolBurst, 3.2)
       teleport(rb, RESPAWN_POINTS[game.checkpoint] ?? RESPAWN_POINTS[0])
       game.countRespawn()
       return
@@ -185,6 +204,7 @@ export function Player() {
     playerState.position.set(pos.x, pos.y, pos.z)
     playerState.velocity.set(vx, vy, vz)
     playerState.grounded = grounded
+    playerState.inColumn = inColumn
     if (ground) playerState.surface = ground.surface
   })
 

@@ -1,12 +1,14 @@
 import { Canvas } from '@react-three/fiber'
 import { KeyboardControls } from '@react-three/drei'
 import { Physics } from '@react-three/rapier'
+import { Leva } from 'leva'
 import { Suspense } from 'react'
 import { CameraRig } from './components/CameraRig'
 import { HUD } from './components/HUD'
 import { Level } from './components/Level'
 import { Player } from './components/Player'
 import { Splash } from './components/Splash'
+import { Waterfall } from './components/waterfall/Waterfall'
 import { CONFIG } from './config'
 import { KEY_MAP } from './input/controls'
 
@@ -22,7 +24,7 @@ export default function App() {
         <fog attach="fog" args={['#aab8c2', 40, 140]} />
         <hemisphereLight args={['#dfe9f2', '#55595e', 0.9]} />
         <directionalLight
-          position={[12, 30, 14]}
+          position={CONFIG.sunPosition}
           intensity={2}
           castShadow
           shadow-mapSize={[2048, 2048]}
@@ -40,8 +42,10 @@ export default function App() {
           </Physics>
         </Suspense>
         <Splash />
+        <Waterfall />
       </Canvas>
       <HUD />
+      <Leva hidden={!import.meta.env.DEV} collapsed />
     </KeyboardControls>
   )
 }

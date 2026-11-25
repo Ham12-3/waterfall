@@ -1,5 +1,5 @@
 import { RigidBody } from '@react-three/rapier'
-import { GREYBOX_BLOCKS, POOL, type Block, type BlockData } from '../level/greybox'
+import { GREYBOX_BLOCKS, type Block, type BlockData } from '../level/greybox'
 import { useGameStore } from '../state/gameStore'
 
 function CheckpointFlag({ block }: { block: Block }) {
@@ -39,11 +39,6 @@ export function Level() {
           </RigidBody>
         )
       })}
-      {/* Placeholder pool surface; the real water arrives in Phase 3. */}
-      <mesh name="Pool_Water" position={POOL.center} rotation-x={-Math.PI / 2}>
-        <planeGeometry args={POOL.size} />
-        <meshStandardMaterial color="#3f7f9c" transparent opacity={0.72} roughness={0.15} />
-      </mesh>
     </group>
   )
 }
