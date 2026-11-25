@@ -38,3 +38,45 @@ canvas {
 .hud-help {
   font-size: 13px;
 }
+
+.hud-timer {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.hud-finish {
+  align-self: center;
+  text-align: center;
+  background: rgba(20, 24, 30, 0.78);
+  padding: 24px 40px;
+  border-radius: 14px;
+  pointer-events: auto;
+}
+
+.hud-finish h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.hud-finish p {
+  margin: 6px 0;
+}
+
+.hud-finish-time {
+  font-size: 44px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-finish button {
+  margin-top: 12px;
+  padding: 10px 28px;
+  font: inherit;
+  font-weight: 600;
+  color: #14181e;
+  background: #f4f6f8;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}

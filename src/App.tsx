@@ -6,11 +6,9 @@ import { CameraRig } from './components/CameraRig'
 import { HUD } from './components/HUD'
 import { Level } from './components/Level'
 import { Player } from './components/Player'
+import { Splash } from './components/Splash'
 import { CONFIG } from './config'
 import { KEY_MAP } from './input/controls'
-
-const spawn = CONFIG.player.spawn
-const offset = CONFIG.camera.startOffset
 
 export default function App() {
   return (
@@ -18,12 +16,7 @@ export default function App() {
       <Canvas
         shadows
         dpr={[1, 1.5]}
-        camera={{
-          fov: CONFIG.camera.fov,
-          near: 0.1,
-          far: 400,
-          position: [spawn[0] + offset[0], spawn[1] + offset[1], spawn[2] + offset[2]],
-        }}
+        camera={{ fov: CONFIG.camera.fov, near: 0.1, far: 400 }}
       >
         <color attach="background" args={['#aab8c2']} />
         <fog attach="fog" args={['#aab8c2', 40, 140]} />
@@ -43,9 +36,10 @@ export default function App() {
           <Physics gravity={[0, CONFIG.physics.gravity, 0]}>
             <Level />
             <Player />
+            <CameraRig />
           </Physics>
         </Suspense>
-        <CameraRig />
+        <Splash />
       </Canvas>
       <HUD />
     </KeyboardControls>

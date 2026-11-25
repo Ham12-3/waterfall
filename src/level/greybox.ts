@@ -1,31 +1,48 @@
-import type { Vec3 } from '../config'
+import { CONFIG, type SurfaceType, type Vec3 } from '../config'
 
-export interface Block {
+/** Data attached to each block's rigid body so the player can read what it stands on. */
+export interface BlockData {
+  surface: SurfaceType
+  /** 1-based checkpoint number; standing here saves progress. */
+  checkpoint?: number
+  finish?: boolean
+}
+
+export interface Block extends BlockData {
   name: string
   position: Vec3
   size: Vec3
   color: string
 }
 
-const GROUND = '#6f7378'
+const SHORE = '#7b7f84'
+const POOL_FLOOR = '#4f545b'
 const CLIFF = '#676c73'
-const LEDGE = '#9aa0a6'
+const SURFACE_COLORS: Record<SurfaceType, string> = {
+  default: '#9aa0a6',
+  wet: '#566979',
+  moss: '#7e9a63',
+}
+
+const LEDGE_COUNT = 14
+/** Ledges (0-based) that act as checkpoints. */
+const CHECKPOINT_LEDGES = [3, 7, 11]
 
 /** Zig-zag staircase of ledges climbing the cliff face. */
 function buildLedges(): Block[] {
   const ledges: Block[] = []
-  const count = 14
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < LEDGE_COUNT; i++) {
     const side = i % 4 < 2 ? -1 : 1
-    const x = side * (1.6 + (i % 2) * 2.6)
-    const y = 1 + i * 1.25
-    const z = -1.5 - (i % 3) * 0.9
-    const width = 2.6 - (i % 3) * 0.3
+    const checkpointIndex = CHECKPOINT_LEDGES.indexOf(i)
+    const isCheckpoint = checkpointIndex >= 0
+    const surface: SurfaceType = isCheckpoint ? 'moss' : i % 3 === 1 ? 'wet' : i % 3 === 2 ? 'moss' : 'default'
     ledges.push({
       name: `Ledge_${String(i + 1).padStart(2, '0')}`,
-      position: [x, y, z],
-      size: [width, 0.5, 2.2],
-      color: LEDGE,
+      position: [side * (1.6 + (i % 2) * 2.6), 1 + i * 1.25, -1.7 - (i % 3) * 0.3],
+      size: [isCheckpoint ? 3 : 2.6 - (i % 3) * 0.3, 0.5, 2.2],
+      color: SURFACE_COLORS[surface],
+      surface,
+      checkpoint: isCheckpoint ? checkpointIndex + 1 : undefined,
     })
   }
   return ledges
@@ -35,10 +52,34 @@ const ledges = buildLedges()
 const topY = ledges[ledges.length - 1].position[1]
 
 export const GREYBOX_BLOCKS: Block[] = [
-  { name: 'Ground', position: [0, -0.5, 4], size: [40, 1, 30], color: GROUND },
-  { name: 'Cliff_Main', position: [0, topY / 2, -6], size: [26, topY + 2, 6], color: CLIFF },
+  { name: 'Shore', position: [0, -0.5, 12], size: [40, 1, 16], color: SHORE, surface: 'default' },
+  { name: 'Pool_Floor', position: [0, -2.5, -0.5], size: [40, 1, 9], color: POOL_FLOOR, surface: 'default' },
+  { name: 'Cliff_Main', position: [0, topY / 2 - 1, -6], size: [26, topY + 4, 6], color: CLIFF, surface: 'default' },
+  { name: 'Stone_01', position: [0.4, -0.1, 2.3], size: [1.7, 0.6, 1.7], color: SURFACE_COLORS.wet, surface: 'wet' },
+  { name: 'Stone_02', position: [-0.9, 0.2, 0.2], size: [1.7, 0.6, 1.7], color: SURFACE_COLORS.moss, surface: 'moss' },
   ...ledges,
-  { name: 'Summit', position: [0, topY + 1.25, -5], size: [10, 0.5, 5], color: LEDGE },
+  {
+    name: 'Summit',
+    position: [0, topY + 1.25, -5],
+    size: [10, 0.5, 5],
+    color: SURFACE_COLORS.default,
+    surface: 'default',
+    finish: true,
+  },
 ]
 
+/** Pool water rectangle, between the shore and the cliff face. */
+export const POOL = { center: [0, CONFIG.level.waterY, 0.5] as Vec3, size: [26, 7] as [number, number] }
+
+const standHeight = CONFIG.player.halfHeight + CONFIG.player.radius + 0.3
+
+/** Respawn points. Index 0 is the start; the rest sit on top of checkpoint ledges. */
+export const RESPAWN_POINTS: Vec3[] = [
+  CONFIG.player.spawn,
+  ...ledges
+    .filter((l) => l.checkpoint !== undefined)
+    .map((l): Vec3 => [l.position[0], l.position[1] + l.size[1] / 2 + standHeight, l.position[2] + 0.2]),
+]
+
+export const CHECKPOINT_COUNT = CHECKPOINT_LEDGES.length
 export const SUMMIT_HEIGHT = topY + 1.5
