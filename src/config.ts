@@ -75,6 +75,8 @@ export const CONFIG = {
     /** Width and height of the splash flipbook quad, in metres. */
     splashSize: [4.6, 2.3] as [number, number],
   },
+  /** Light haze; the colour matches the horizon of the sky panorama. */
+  fog: { color: '#d8cbc6', near: 45, far: 160 },
   /** Directional light position; the pool glint uses the same direction. */
   sunPosition: [12, 30, 14] as Vec3,
   /** Starting values for the waterfall shader; live-tunable in leva (dev only). */
@@ -82,7 +84,7 @@ export const CONFIG = {
     speed: 1.3,
     color: '#8fd0e6',
     deepColor: '#2f7fa6',
-    foam: 0.75,
+    foam: 0.55,
     opacity: 0.8,
     /** Vertex ripple depth in metres. */
     wobble: 0.14,
@@ -110,9 +112,34 @@ export const CONFIG = {
   mist: {
     count: 36,
     color: '#eef6f9',
-    opacity: 0.16,
+    /** Low, because blending happens in linear light under the post-processing composer. */
+    opacity: 0.045,
     minSize: 4,
     maxSize: 9,
+  },
+  post: {
+    bloomIntensity: 0.2,
+    /** Only pixels brighter than this bloom (the white water and sky). */
+    bloomThreshold: 0.92,
+    depthOfField: true,
+    bokehScale: 2.2,
+    /** Depth of the in-focus band around the player, in metres. */
+    focusRange: 26,
+    vignetteDarkness: 0.55,
+    multisampling: 4,
+  },
+  audio: {
+    masterVolume: 0.8,
+    pausedVolume: 0.2,
+    /** Waterfall roar level and low-pass cutoff (Hz), far from and next to the falls. */
+    roarFarGain: 0.12,
+    roarNearGain: 0.75,
+    roarFarCutoff: 500,
+    roarNearCutoff: 4200,
+    /** Distance in metres at which the roar is halfway to its far level. */
+    roarFalloff: 5,
+    splashGain: 0.9,
+    landGain: 0.5,
   },
   spray: {
     /** Size of the shared particle pool. */

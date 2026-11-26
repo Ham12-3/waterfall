@@ -7,7 +7,7 @@ import { CONFIG, type Vec3 } from '../config'
 import type { Control } from '../input/controls'
 import { RESPAWN_POINTS, WATER_COLUMNS, type BlockData } from '../level/greybox'
 import { emitSpray } from '../state/effects'
-import { useGameStore } from '../state/gameStore'
+import { runClock, useGameStore } from '../state/gameStore'
 import { playerState } from '../state/playerState'
 
 const P = CONFIG.player
@@ -93,14 +93,17 @@ export function Player() {
     const keys = getKeys()
 
     // Retry: R key, or the retry button (which bumps runId).
-    if (keys.retry && !m.retryHeld) game.retry()
+    if (keys.retry && !m.retryHeld && game.phase !== 'title') game.retry()
     m.retryHeld = keys.retry
-    const runId = useGameStore.getState().runId
+    const { runId, phase } = useGameStore.getState()
     if (runId !== m.runId) {
       m.runId = runId
       teleport(rb, RESPAWN_POINTS[0])
       return
     }
+    // The title screen and pause menu freeze the player (physics is paused too).
+    if (phase === 'title' || phase === 'paused') return
+    if (phase === 'playing' && runClock.started) runClock.time += Math.min(rawDt, 0.1)
 
     const vel = rb.linvel()
     const ground = vel.y < 0.5 ? probeGround(rb) : null
@@ -113,6 +116,9 @@ export function Player() {
       const over = impact - CONFIG.camera.shakeThreshold
       if (over > 0) playerState.shake = Math.min(CONFIG.camera.shakeMax, over * 0.05)
       m.jumping = false
+      playerState.landing.id += 1
+      playerState.landing.impact = impact
+      playerState.landing.wet = ground.surface === 'wet'
       // Wet stone throws up spray underfoot.
       if (ground.surface === 'wet') {
         const p = rb.translation()
@@ -135,7 +141,7 @@ export function Player() {
       .addScaledVector(forward, Number(keys.forward) - Number(keys.back))
       .addScaledVector(right, Number(keys.right) - Number(keys.left))
     if (wish.lengthSq() > 1) wish.normalize()
-    if (wish.lengthSq() > 0) game.startRun()
+    if (wish.lengthSq() > 0 && phase === 'playing') runClock.started = true
     wish.multiplyScalar(keys.sprint ? P.sprintSpeed : P.runSpeed)
 
     // Heavy water columns carry the player away from the cliff and press down.
@@ -162,7 +168,7 @@ export function Player() {
       vy = P.jumpSpeed * (inColumn ? COLUMN.jumpMultiplier : 1)
       m.buffer = m.coyote = 0
       m.jumping = true
-      game.startRun()
+      if (phase === 'playing') runClock.started = true
     }
     // Releasing Space early cuts the jump short.
     if (m.jumping && !keys.jump && vy > 0) {

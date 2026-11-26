@@ -17,6 +17,8 @@ export const playerState = {
   body: null as RapierRigidBody | null,
   /** Camera shake strength in metres; CameraRig decays it. */
   shake: 0,
+  /** Latest landing, for audio. `id` increases on every touchdown. */
+  landing: { id: 0, impact: 0, wet: false },
   /** Latest pool splash. `id` increases each time so effects can spot a new one. */
   splash: { id: 0, position: new Vector3() },
 }
