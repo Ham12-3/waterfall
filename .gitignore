@@ -9,3 +9,6 @@ assets-src/raw/mixamo/
 # Blender working file: over 200 MB, and holds the full-resolution Mixamo and Poly Haven sources
 assets-src/blender/*.blend
 __pycache__/
+
+.vercel
+.env*
