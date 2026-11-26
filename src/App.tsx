@@ -2,14 +2,14 @@ import { Canvas } from '@react-three/fiber'
 import { KeyboardControls } from '@react-three/drei'
 import { Physics } from '@react-three/rapier'
 import { Leva } from 'leva'
-import { Suspense } from 'react'
+import { lazy, Suspense } from 'react'
 import { CameraRig } from './components/CameraRig'
+import { DevStats } from './components/DevStats'
 import { GameAudio } from './components/GameAudio'
 import { HUD } from './components/HUD'
 import { Level } from './components/Level'
 import { Logs } from './components/Logs'
 import { Player } from './components/Player'
-import { PostFX } from './components/PostFX'
 import { Screens } from './components/Screens'
 import { Sky } from './components/Sky'
 import { Splash } from './components/Splash'
@@ -17,6 +17,10 @@ import { Waterfall } from './components/waterfall/Waterfall'
 import { CONFIG } from './config'
 import { KEY_MAP } from './input/controls'
 import { useGameStore } from './state/gameStore'
+
+// Post-processing is a large library and not needed for the first frame, so it
+// loads as its own chunk once the game is already on screen.
+const PostFX = lazy(() => import('./components/PostFX').then((m) => ({ default: m.PostFX })))
 
 export default function App() {
   // The world only moves while a run is in progress or just finished.
@@ -53,7 +57,10 @@ export default function App() {
           <Waterfall />
         </Suspense>
         <GameAudio />
-        <PostFX />
+        <Suspense fallback={null}>
+          <PostFX />
+        </Suspense>
+        {import.meta.env.DEV && <DevStats />}
       </Canvas>
       <HUD />
       <Screens />

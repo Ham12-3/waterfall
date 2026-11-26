@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
-import { Group, Mesh, Quaternion, Vector3, type BufferGeometry, type Object3D } from 'three'
+import { Group, Mesh, Quaternion, Vector3, type BufferGeometry, type Material, type Object3D } from 'three'
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { ASSETS, DRACO_PATH } from '../assets'
 import type { BlockData } from './greybox'
 
@@ -33,6 +34,9 @@ export function useLevelModel(): LevelModel {
   return useMemo(() => {
     const visuals = new Group()
     visuals.name = 'Level_Visuals'
+    // Static geometry is baked into world space and grouped by material, so the
+    // whole level draws in one call per material instead of one per rock.
+    const byMaterial = new Map<Material, BufferGeometry[]>()
     const colliders: BoxCollider[] = []
     const logs: LevelModel['logs'] = {}
     let sheetGeometry: BufferGeometry | null = null
@@ -58,15 +62,28 @@ export function useLevelModel(): LevelModel {
         object.quaternion.identity()
         logs[node.name] = { object, length: node.userData.length ?? 3, radius: node.userData.radius ?? 0.35 }
       } else {
-        const copy = node.clone()
-        copy.traverse((child) => {
-          if ((child as Mesh).isMesh) {
-            child.castShadow = true
-            child.receiveShadow = true
-          }
+        node.updateWorldMatrix(true, true)
+        node.traverse((child) => {
+          const mesh = child as Mesh
+          if (!mesh.isMesh) return
+          const baked = mesh.geometry.clone().applyMatrix4(mesh.matrixWorld)
+          const material = mesh.material as Material
+          const list = byMaterial.get(material)
+          if (list) list.push(baked)
+          else byMaterial.set(material, [baked])
         })
-        visuals.add(copy)
       }
+    }
+
+    for (const [material, geometries] of byMaterial) {
+      const merged = mergeGeometries(geometries, false)
+      geometries.forEach((g) => g.dispose())
+      if (!merged) throw new Error(`Could not merge level geometry for material ${material.name}`)
+      const mesh = new Mesh(merged, material)
+      mesh.name = `Level_${material.name}`
+      mesh.castShadow = true
+      mesh.receiveShadow = true
+      visuals.add(mesh)
     }
 
     if (!sheetGeometry) throw new Error('level.glb is missing Waterfall_Sheet')
