@@ -1,13 +1,13 @@
-import { RigidBody } from '@react-three/rapier'
-import { GREYBOX_BLOCKS, type Block, type BlockData } from '../level/greybox'
+import { CuboidCollider, RigidBody } from '@react-three/rapier'
+import { useLevelModel, type BoxCollider } from '../level/useLevelModel'
 import { useGameStore } from '../state/gameStore'
 
-function CheckpointFlag({ block }: { block: Block }) {
-  const reached = useGameStore((s) => s.checkpoint >= (block.checkpoint ?? 0))
-  const top = block.size[1] / 2
+function CheckpointFlag({ box }: { box: BoxCollider }) {
+  const reached = useGameStore((s) => s.checkpoint >= (box.checkpoint ?? 0))
+  const [hx, hy, hz] = box.halfExtents
   return (
-    <group position={[block.size[0] / 2 - 0.25, top, -block.size[2] / 2 + 0.3]}>
-      <mesh position={[0, 0.6, 0]}>
+    <group position={[hx - 0.3, hy, -hz + 0.35]}>
+      <mesh position={[0, 0.6, 0]} castShadow>
         <cylinderGeometry args={[0.04, 0.04, 1.2, 8]} />
         <meshStandardMaterial color="#2b2f36" />
       </mesh>
@@ -23,22 +23,25 @@ function CheckpointFlag({ block }: { block: Block }) {
   )
 }
 
-/** Grey box test level. Replaced by the Blender level in Phase 5. */
+/** The Blender-built level: drawn meshes plus invisible box colliders. */
 export function Level() {
+  const { visuals, colliders } = useLevelModel()
   return (
     <group name="Level">
-      {GREYBOX_BLOCKS.map((block) => {
-        const data: BlockData = { surface: block.surface, checkpoint: block.checkpoint, finish: block.finish }
-        return (
-          <RigidBody key={block.name} type="fixed" colliders="cuboid" position={block.position} userData={data}>
-            <mesh name={block.name} castShadow receiveShadow>
-              <boxGeometry args={block.size} />
-              <meshStandardMaterial color={block.color} roughness={block.surface === 'wet' ? 0.25 : 0.9} />
-            </mesh>
-            {block.checkpoint !== undefined && <CheckpointFlag block={block} />}
-          </RigidBody>
-        )
-      })}
+      <primitive object={visuals} />
+      {colliders.map((box) => (
+        <RigidBody
+          key={box.name}
+          type="fixed"
+          colliders={false}
+          position={box.position}
+          quaternion={box.quaternion}
+          userData={{ surface: box.surface, checkpoint: box.checkpoint, finish: box.finish }}
+        >
+          <CuboidCollider args={box.halfExtents} />
+          {box.checkpoint !== undefined && <CheckpointFlag box={box} />}
+        </RigidBody>
+      ))}
     </group>
   )
 }

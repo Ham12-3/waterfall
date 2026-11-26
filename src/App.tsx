@@ -7,6 +7,7 @@ import { CameraRig } from './components/CameraRig'
 import { GameAudio } from './components/GameAudio'
 import { HUD } from './components/HUD'
 import { Level } from './components/Level'
+import { Logs } from './components/Logs'
 import { Player } from './components/Player'
 import { PostFX } from './components/PostFX'
 import { Screens } from './components/Screens'
@@ -41,6 +42,7 @@ export default function App() {
         <Suspense fallback={null}>
           <Physics gravity={[0, CONFIG.physics.gravity, 0]} paused={frozen}>
             <Level />
+            <Logs />
             <Player />
             <CameraRig />
           </Physics>

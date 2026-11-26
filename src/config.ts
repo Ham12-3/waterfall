@@ -93,6 +93,16 @@ export const CONFIG = {
     /** How far the bottom of the sheet has drifted out from the top. */
     lean: 0.7,
   },
+  /** Logs drifting down the face of the falls. */
+  logs: {
+    count: 3,
+    /** Metres per second downward. */
+    speed: 1.5,
+    /** X position of each log in turn; they fall just in front of the ledges. */
+    laneX: [0, -0.5, 0.5],
+    laneZ: -0.05,
+    rollSpeed: 0.5,
+  },
   /** Heavy columns of water that shove the player around. */
   waterColumn: {
     radius: 0.55,

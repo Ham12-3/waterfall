@@ -2,33 +2,17 @@ import { useEffect, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { MeshReflectorMaterial, useTexture } from '@react-three/drei'
 import { useControls } from 'leva'
-import { PlaneGeometry, RepeatWrapping, type Color } from 'three'
+import { RepeatWrapping, type Color } from 'three'
 import { ASSETS } from '../../assets'
 import { CONFIG } from '../../config'
 import { POOL, WATERFALL, WATER_COLUMNS } from '../../level/greybox'
+import { useLevelModel } from '../../level/useLevelModel'
 import { createFallMaterial, createFoamMaterial, createPoolMaterial } from './materials'
 import { Mist } from './Mist'
 import { Spray } from './Spray'
 
 const F = CONFIG.waterfall
-const HEIGHT = WATERFALL.topY - WATERFALL.bottomY
 const FOAM_DEPTH = 3.4
-
-/**
- * The falling sheet: a plane curved out from the cliff in the middle and
- * leaning outward towards the bottom. UVs run cleanly top to bottom.
- */
-function buildSheetGeometry() {
-  const geometry = new PlaneGeometry(WATERFALL.width, HEIGHT, 40, 48)
-  const position = geometry.attributes.position
-  for (let i = 0; i < position.count; i++) {
-    const u = position.getX(i) / (WATERFALL.width / 2)
-    const fromTop = 0.5 - position.getY(i) / HEIGHT
-    position.setZ(i, F.bulge * (1 - u * u) + F.lean * fromTop * fromTop)
-  }
-  geometry.computeVertexNormals()
-  return geometry
-}
 
 /** The real-time waterfall: sheet, columns, base foam, pool, spray and mist. */
 export function Waterfall() {
@@ -49,7 +33,8 @@ export function Waterfall() {
   const foamMask = useTexture(ASSETS.foamMask)
   foamMask.wrapS = foamMask.wrapT = RepeatWrapping
 
-  const sheetGeometry = useMemo(buildSheetGeometry, [])
+  // The curved sheet mesh is modelled in Blender, with UVs running top to bottom.
+  const { sheetGeometry } = useLevelModel()
   const materials = useMemo(
     () => ({
       sheet: createFallMaterial([30, 5], 0.06),
@@ -60,13 +45,7 @@ export function Waterfall() {
     [foamMask],
   )
 
-  useEffect(
-    () => () => {
-      sheetGeometry.dispose()
-      Object.values(materials).forEach((m) => m.dispose())
-    },
-    [sheetGeometry, materials],
-  )
+  useEffect(() => () => Object.values(materials).forEach((m) => m.dispose()), [materials])
 
   // Push leva values into the shader uniforms.
   useEffect(() => {
@@ -128,7 +107,6 @@ export function Waterfall() {
         name="Waterfall_Sheet"
         geometry={sheetGeometry}
         material={materials.sheet}
-        position={[0, WATERFALL.bottomY + HEIGHT / 2, WATERFALL.z]}
         renderOrder={3}
       />
 

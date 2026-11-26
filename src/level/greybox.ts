@@ -54,7 +54,10 @@ const topY = ledges[ledges.length - 1].position[1]
 export const GREYBOX_BLOCKS: Block[] = [
   { name: 'Shore', position: [0, -0.5, 12], size: [40, 1, 16], color: SHORE, surface: 'default' },
   { name: 'Pool_Floor', position: [0, -2.5, -0.5], size: [40, 1, 9], color: POOL_FLOOR, surface: 'default' },
-  { name: 'Cliff_Main', position: [0, topY / 2 - 1, -6], size: [26, topY + 4, 6], color: CLIFF, surface: 'default' },
+  { name: 'Cliff_Main', position: [0, topY / 2 - 1, -6], size: [40, topY + 4, 6], color: CLIFF, surface: 'default' },
+  // Rock banks that close off the pool on either side of the water.
+  { name: 'Bank_L', position: [-16.5, -1.25, 0.5], size: [7, 2.5, 7], color: SHORE, surface: 'default' },
+  { name: 'Bank_R', position: [16.5, -1.25, 0.5], size: [7, 2.5, 7], color: SHORE, surface: 'default' },
   { name: 'Stone_01', position: [0.4, -0.1, 2.3], size: [1.7, 0.6, 1.7], color: SURFACE_COLORS.wet, surface: 'wet' },
   { name: 'Stone_02', position: [-0.9, 0.2, 0.2], size: [1.7, 0.6, 1.7], color: SURFACE_COLORS.moss, surface: 'moss' },
   ...ledges,

@@ -1,0 +1,370 @@
+{
+ "blocks": [
+  {
+   "name": "Shore",
+   "position": [
+    0,
+    -0.5,
+    12
+   ],
+   "size": [
+    40,
+    1,
+    16
+   ],
+   "color": "#7b7f84",
+   "surface": "default"
+  },
+  {
+   "name": "Pool_Floor",
+   "position": [
+    0,
+    -2.5,
+    -0.5
+   ],
+   "size": [
+    40,
+    1,
+    9
+   ],
+   "color": "#4f545b",
+   "surface": "default"
+  },
+  {
+   "name": "Cliff_Main",
+   "position": [
+    0,
+    7.625,
+    -6
+   ],
+   "size": [
+    40,
+    21.25,
+    6
+   ],
+   "color": "#676c73",
+   "surface": "default"
+  },
+  {
+   "name": "Bank_L",
+   "position": [
+    -16.5,
+    -1.25,
+    0.5
+   ],
+   "size": [
+    7,
+    2.5,
+    7
+   ],
+   "color": "#7b7f84",
+   "surface": "default"
+  },
+  {
+   "name": "Bank_R",
+   "position": [
+    16.5,
+    -1.25,
+    0.5
+   ],
+   "size": [
+    7,
+    2.5,
+    7
+   ],
+   "color": "#7b7f84",
+   "surface": "default"
+  },
+  {
+   "name": "Stone_01",
+   "position": [
+    0.4,
+    -0.1,
+    2.3
+   ],
+   "size": [
+    1.7,
+    0.6,
+    1.7
+   ],
+   "color": "#566979",
+   "surface": "wet"
+  },
+  {
+   "name": "Stone_02",
+   "position": [
+    -0.9,
+    0.2,
+    0.2
+   ],
+   "size": [
+    1.7,
+    0.6,
+    1.7
+   ],
+   "color": "#7e9a63",
+   "surface": "moss"
+  },
+  {
+   "name": "Ledge_01",
+   "position": [
+    -1.6,
+    1,
+    -1.7
+   ],
+   "size": [
+    2.6,
+    0.5,
+    2.2
+   ],
+   "color": "#9aa0a6",
+   "surface": "default"
+  },
+  {
+   "name": "Ledge_02",
+   "position": [
+    -4.2,
+    2.25,
+    -2
+   ],
+   "size": [
+    2.3000000000000003,
+    0.5,
+    2.2
+   ],
+   "color": "#566979",
+   "surface": "wet"
+  },
+  {
+   "name": "Ledge_03",
+   "position": [
+    1.6,
+    3.5,
+    -2.3
+   ],
+   "size": [
+    2,
+    0.5,
+    2.2
+   ],
+   "color": "#7e9a63",
+   "surface": "moss"
+  },
+  {
+   "name": "Ledge_04",
+   "position": [
+    4.2,
+    4.75,
+    -1.7
+   ],
+   "size": [
+    3,
+    0.5,
+    2.2
+   ],
+   "color": "#7e9a63",
+   "surface": "moss",
+   "checkpoint": 1
+  },
+  {
+   "name": "Ledge_05",
+   "position": [
+    -1.6,
+    6,
+    -2
+   ],
+   "size": [
+    2.3000000000000003,
+    0.5,
+    2.2
+   ],
+   "color": "#566979",
+   "surface": "wet"
+  },
+  {
+   "name": "Ledge_06",
+   "position": [
+    -4.2,
+    7.25,
+    -2.3
+   ],
+   "size": [
+    2,
+    0.5,
+    2.2
+   ],
+   "color": "#7e9a63",
+   "surface": "moss"
+  },
+  {
+   "name": "Ledge_07",
+   "position": [
+    1.6,
+    8.5,
+    -1.7
+   ],
+   "size": [
+    2.6,
+    0.5,
+    2.2
+   ],
+   "color": "#9aa0a6",
+   "surface": "default"
+  },
+  {
+   "name": "Ledge_08",
+   "position": [
+    4.2,
+    9.75,
+    -2
+   ],
+   "size": [
+    3,
+    0.5,
+    2.2
+   ],
+   "color": "#7e9a63",
+   "surface": "moss",
+   "checkpoint": 2
+  },
+  {
+   "name": "Ledge_09",
+   "position": [
+    -1.6,
+    11,
+    -2.3
+   ],
+   "size": [
+    2,
+    0.5,
+    2.2
+   ],
+   "color": "#7e9a63",
+   "surface": "moss"
+  },
+  {
+   "name": "Ledge_10",
+   "position": [
+    -4.2,
+    12.25,
+    -1.7
+   ],
+   "size": [
+    2.6,
+    0.5,
+    2.2
+   ],
+   "color": "#9aa0a6",
+   "surface": "default"
+  },
+  {
+   "name": "Ledge_11",
+   "position": [
+    1.6,
+    13.5,
+    -2
+   ],
+   "size": [
+    2.3000000000000003,
+    0.5,
+    2.2
+   ],
+   "color": "#566979",
+   "surface": "wet"
+  },
+  {
+   "name": "Ledge_12",
+   "position": [
+    4.2,
+    14.75,
+    -2.3
+   ],
+   "size": [
+    3,
+    0.5,
+    2.2
+   ],
+   "color": "#7e9a63",
+   "surface": "moss",
+   "checkpoint": 3
+  },
+  {
+   "name": "Ledge_13",
+   "position": [
+    -1.6,
+    16,
+    -1.7
+   ],
+   "size": [
+    2.6,
+    0.5,
+    2.2
+   ],
+   "color": "#9aa0a6",
+   "surface": "default"
+  },
+  {
+   "name": "Ledge_14",
+   "position": [
+    -4.2,
+    17.25,
+    -2
+   ],
+   "size": [
+    2.3000000000000003,
+    0.5,
+    2.2
+   ],
+   "color": "#566979",
+   "surface": "wet"
+  },
+  {
+   "name": "Summit",
+   "position": [
+    0,
+    18.5,
+    -5
+   ],
+   "size": [
+    10,
+    0.5,
+    5
+   ],
+   "color": "#9aa0a6",
+   "surface": "default",
+   "finish": true
+  }
+ ],
+ "waterfall": {
+  "width": 12,
+  "topY": 18.85,
+  "bottomY": -0.5,
+  "z": -2.4
+ },
+ "columns": [
+  {
+   "x": -4.75,
+   "z": -2.0999999999999996,
+   "topY": 12,
+   "bottomY": 7.5
+  },
+  {
+   "x": -5.05,
+   "z": -1.5,
+   "topY": 17,
+   "bottomY": 12.5
+  }
+ ],
+ "pool": {
+  "center": [
+   0,
+   -0.5,
+   0.5
+  ],
+  "size": [
+   26,
+   7
+  ]
+ },
+ "summitHeight": 18.75
+}
