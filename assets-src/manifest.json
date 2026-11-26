@@ -1,3 +1,103 @@
 {
-  "assets": []
+  "flowProject": "Cascade Game (https://flow.google.com/project/d37d3dc6-768b-4759-9e96-d9bc926d04df)",
+  "assets": [
+    {
+      "file": "assets-src/raw/concept_01.jpg",
+      "gameFile": "public/assets/images/concept_01.webp",
+      "tool": "Flow image",
+      "model": "Nano Banana Pro",
+      "date": "2026-11-26",
+      "prompt": "Wide establishing shot concept art for a 3D adventure platformer video game, stylised realism like a modern adventure game. A colossal tropical waterfall pours down a towering dark basalt cliff into a turquoise plunge pool. Flat wet rock ledges and stepping stones jut out of the cliff face at staggered heights like a natural staircase, some covered in lush green moss, with fallen logs wedged between rocks. Thick white mist and spray at the base, warm god rays cutting through the mist from the upper left, dense jungle foliage framing the sides. A small athletic human adventurer in simple outdoor clothes is captured mid-jump between two ledges halfway up, tiny against the scale of the falls. Painterly but detailed, rich saturated greens and teals, cinematic lighting, high detail, no text, no UI.",
+      "usedIn": "Art direction reference; planned loading / title screen backdrop (Phase 7) and trailer ingredient (Phase 9)"
+    },
+    {
+      "file": "assets-src/raw/concept_02.jpg",
+      "tool": "Flow image",
+      "model": "Nano Banana Pro",
+      "date": "2026-11-26",
+      "prompt": "Same prompt as concept_01 (4 variations from one generation).",
+      "usedIn": "Art direction reference for the Blender level (Phase 5); trailer ingredient"
+    },
+    {
+      "file": "assets-src/raw/concept_03.jpg",
+      "tool": "Flow image",
+      "model": "Nano Banana Pro",
+      "date": "2026-11-26",
+      "prompt": "Same prompt as concept_01 (4 variations from one generation).",
+      "usedIn": "Art direction reference for the Blender level (Phase 5); trailer ingredient"
+    },
+    {
+      "file": "assets-src/raw/concept_04.jpg",
+      "tool": "Flow image",
+      "model": "Nano Banana Pro",
+      "date": "2026-11-26",
+      "prompt": "Same prompt as concept_01 (4 variations from one generation).",
+      "usedIn": "Art direction reference for the Blender level (Phase 5); trailer ingredient"
+    },
+    {
+      "file": "assets-src/raw/tex_basalt.jpg",
+      "gameFile": "public/assets/textures/basalt.webp",
+      "tool": "Flow image",
+      "model": "Nano Banana Pro",
+      "date": "2026-11-26",
+      "prompt": "Seamless tileable texture of wet dark basalt rock, top-down orthographic view, perfectly flat even lighting, no shadows, no highlights, no perspective. Dark charcoal grey volcanic stone with fine cracks, subtle blue-grey variation and a slightly damp sheen, uniform detail across the whole frame with no focal point, edges that tile seamlessly on all four sides. Stylised realism, hand-painted game texture, albedo map, square.",
+      "usedIn": "Cliff face and wet (slippery) ledge rocks"
+    },
+    {
+      "file": "assets-src/raw/tex_moss.jpg",
+      "gameFile": "public/assets/textures/moss.webp",
+      "tool": "Flow image",
+      "model": "Nano Banana Pro",
+      "date": "2026-11-26",
+      "prompt": "Seamless tileable texture of mossy rock, top-down orthographic view, perfectly flat even lighting, no shadows, no highlights, no perspective. Dark grey stone almost fully covered in lush vivid green moss with small patches of bare rock and tiny lichen specks, uniform detail across the whole frame with no focal point, edges that tile seamlessly on all four sides. Stylised realism, hand-painted game texture, albedo map, square.",
+      "usedIn": "Mossy (grippy) ledge rocks and checkpoint ledges"
+    },
+    {
+      "file": "assets-src/raw/tex_pool_floor.jpg",
+      "gameFile": "public/assets/textures/pool_floor.webp",
+      "tool": "Flow image",
+      "model": "Nano Banana Pro",
+      "date": "2026-11-26",
+      "prompt": "Seamless tileable texture of a shallow river pool floor, top-down orthographic view, perfectly flat even lighting, no shadows, no highlights, no perspective, no water. Pale wet sand densely scattered with small smooth rounded pebbles in warm grey, tan and slate tones, uniform detail across the whole frame with no focal point, edges that tile seamlessly on all four sides. Stylised realism, hand-painted game texture, albedo map, square.",
+      "notes": "Second attempt. The first attempt was merged with the bark prompt by Flow because the prompts were submitted too close together.",
+      "usedIn": "Plunge pool basin floor and shore"
+    },
+    {
+      "file": "assets-src/raw/tex_bark.jpg",
+      "gameFile": "public/assets/textures/bark.webp",
+      "tool": "Flow image",
+      "model": "Nano Banana Pro",
+      "date": "2026-11-26",
+      "prompt": "Seamless tileable texture of tree bark for a fallen log, flat orthographic view, perfectly flat even lighting, no shadows, no highlights, no perspective. Rough dark brown tropical hardwood bark with deep vertical furrows running straight from top to bottom, a few damp darker streaks and tiny flecks of green moss, uniform detail across the whole frame with no focal point, edges that tile seamlessly on all four sides. Stylised realism, hand-painted game texture, albedo map, square.",
+      "notes": "Second attempt (see tex_pool_floor).",
+      "usedIn": "Floating logs"
+    },
+    {
+      "file": "assets-src/raw/tex_foam.jpg",
+      "gameFile": "public/assets/textures/foam.webp",
+      "tool": "Flow image",
+      "model": "Nano Banana Pro",
+      "date": "2026-11-26",
+      "prompt": "Seamless tileable texture of white water foam, top-down orthographic view, perfectly flat even lighting, no shadows, no perspective. Churning white river foam with clusters of fine bubbles and lacy froth trails on a pure black background, the foam covering about half of the frame, uniform distribution across the whole frame with no focal point, edges that tile seamlessly on all four sides. High contrast black and white, usable as an alpha mask, square.",
+      "usedIn": "Foam mask for the pool foam ring and waterfall base"
+    },
+    {
+      "file": "assets-src/raw/sky_panorama.jpg",
+      "gameFile": "public/assets/textures/sky_panorama.webp",
+      "tool": "Flow image",
+      "model": "Nano Banana Pro",
+      "date": "2026-11-26",
+      "prompt": "Ultra-wide seamless panoramic sky and landscape for a video game skybox, equirectangular style, horizon line exactly in the vertical middle of the image and perfectly level. Upper half: bright tropical morning sky, soft blue with scattered warm-lit cumulus clouds and a hazy sun low on the left. Lower half: rolling distant jungle-covered hills and misty valleys fading into atmospheric haze, receding in layers. No waterfall, no river, no buildings, no people, no foreground objects, no text. Left and right edges match so the panorama wraps seamlessly. Stylised realism, painterly, soft atmospheric perspective, same style as a modern adventure game.",
+      "notes": "Flow has no 2:1 ratio. Generated at 16:9 (1376x768) and stretched to 2048x1024 for the game.",
+      "usedIn": "Background sky sphere"
+    },
+    {
+      "file": "assets-src/raw/character_sheet.jpg",
+      "tool": "Flow image",
+      "model": "Nano Banana Pro",
+      "date": "2026-11-26",
+      "prompt": "Character reference sheet (turnaround) for a 3D video game model. One athletic young adult adventurer shown three times at the same scale in a row: front view, side profile view, and back view. Standing upright in a strict T-pose with arms straight out horizontally and legs slightly apart, neutral expression. Simple practical outdoor clothes: fitted rust-orange short-sleeve shirt, dark olive cargo trousers, sturdy brown hiking boots, short dark hair, no backpack, no weapons, no accessories. Full body visible head to toe in every view, feet on the same baseline. Plain flat mid-grey background, even flat studio lighting, no shadows, no text, no labels. Stylised realism like a modern adventure game character.",
+      "usedIn": "Modelling / image-to-3D reference for the player character (Phase 6)"
+    }
+  ]
 }
