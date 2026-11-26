@@ -138,6 +138,15 @@
       "contents": "Cliff_Main, 14 ledges + 2 stepping stones + 6 boulders as instances of five rock shapes (Rock_A to Rock_E, 1,536 tris each), Summit, Bank_L, Bank_R, Shore, Pool_Basin, Log_A, Log_B, Waterfall_Sheet (UVs top to bottom), and 30 box colliders named <Object>_COL with surface / checkpoint / finish custom properties.",
       "budget": "45,964 visual triangles (budget 150,000); textures 1024 px; glb about 1.0 MB with Draco meshes and WebP textures.",
       "usedIn": "The whole playable level (src/level/useLevelModel.ts, Level.tsx, Logs.tsx, waterfall/Waterfall.tsx)"
+    },
+    {
+      "file": "assets-src/raw/mixamo/ (Megan_TPose.fbx, Idle.fbx, Run.fbx, Jump.fbx, Falling.fbx, Landing.fbx; not committed)",
+      "gameFile": "public/assets/models/character.glb",
+      "tool": "Mixamo + Blender",
+      "date": "2026-11-26",
+      "prompt": "No prompt. Mixamo stock character 'Megan' (FBX Binary, T-pose) with the animations 'Idle', 'Running' (In Place), 'Jump' (Jumping In Place), 'Falling Idle' and 'Falling To Landing', each downloaded as FBX, Without Skin, 30 fps, no keyframe reduction.",
+      "processing": "Blender (assets-src/blender/char1_import.py, char2_animations.py, char3_optimize_export.py): clips joined onto one armature as actions Idle / Run / Jump / Fall / Land on separate NLA tracks; upward hip travel removed from Jump and Land so physics alone moves the player; meshes decimated from 54,961 to 14,405 triangles and joined; textures reduced from 4096 / 2048 to 1024; exported as Draco glb with WebP textures.",
+      "usedIn": "The player (src/components/Character.tsx)"
     }
   ]
 }

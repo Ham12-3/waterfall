@@ -2,3 +2,6 @@ node_modules
 dist
 *.local
 *.blend1
+
+# Mixamo source files: large, and Adobe-licensed, so not redistributed in the repo
+assets-src/raw/mixamo/

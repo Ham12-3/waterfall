@@ -10,6 +10,7 @@ export const ASSETS = {
   conceptArt: '/assets/images/concept_01.webp',
   distantWaterfallLoop: '/assets/video/waterfall_distant_loop.mp4',
   level: '/assets/models/level.glb',
+  character: '/assets/models/character.glb',
 } as const
 
 /** Draco decoder files, served locally so the game needs no CDN. */

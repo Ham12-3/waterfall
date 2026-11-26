@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react'
+import { Suspense, useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useKeyboardControls } from '@react-three/drei'
 import { CapsuleCollider, RigidBody, useRapier, type RapierRigidBody } from '@react-three/rapier'
 import { Vector3, type Group } from 'three'
 import { CONFIG, type Vec3 } from '../config'
+import { Character } from './Character'
 import type { Control } from '../input/controls'
 import { RESPAWN_POINTS, WATER_COLUMNS, type BlockData } from '../level/greybox'
 import { emitSpray } from '../state/effects'
@@ -233,15 +234,9 @@ export function Player() {
         restitution={0}
       />
       <group ref={visual}>
-        <mesh castShadow>
-          <capsuleGeometry args={[P.radius, P.halfHeight * 2, 6, 16]} />
-          <meshStandardMaterial color="#e8703a" roughness={0.6} />
-        </mesh>
-        {/* Nose marker so facing direction is visible on the capsule. */}
-        <mesh position={[0, P.halfHeight * 0.6, P.radius]} castShadow>
-          <boxGeometry args={[0.18, 0.18, 0.25]} />
-          <meshStandardMaterial color="#2b2f36" />
-        </mesh>
+        <Suspense fallback={null}>
+          <Character />
+        </Suspense>
       </group>
     </RigidBody>
   )

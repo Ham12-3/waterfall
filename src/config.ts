@@ -93,6 +93,23 @@ export const CONFIG = {
     /** How far the bottom of the sheet has drifted out from the top. */
     lean: 0.7,
   },
+  /** The animated player model and how its clips are blended. */
+  character: {
+    /** Fits the 1.75 m model to the 1.7 m physics capsule. */
+    scale: 0.97,
+    /** Cross-fade between clips, in seconds. */
+    blendTime: 0.14,
+    /** Ground speed (m/s) at which the run clip plays at normal speed. */
+    runCycleSpeed: 6,
+    /** Seconds into the jump clip to start from, skipping its wind-up crouch. */
+    jumpStart: 0.85,
+    /** Landings harder than this (m/s) play the recovery clip. */
+    landImpact: 7,
+    landStart: 0.25,
+    landSpeed: 1.7,
+    /** Seconds the landing clip holds before run / idle take over. */
+    landHold: 0.28,
+  },
   /** Logs drifting down the face of the falls. */
   logs: {
     count: 3,

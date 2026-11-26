@@ -12,7 +12,7 @@ import bpy
 
 OUT = os.path.join(L.ROOT, "public", "assets", "models", "level.glb")
 
-meshes = [o for o in bpy.data.objects if o.type == "MESH"]
+meshes = [o for o in bpy.data.scenes["Scene"].objects if o.type == "MESH"]
 visual = [o for o in meshes if not o.name.endswith("_COL")]
 over = [(o.name, L.tri_count(o.data)) for o in visual if o.name.startswith(("Ledge_", "Stone_", "Boulder_")) and L.tri_count(o.data) > 2000]
 print("objects:", len(meshes), "| visual:", len(visual), "| colliders:", len(meshes) - len(visual))
@@ -20,11 +20,13 @@ print("total visual tris:", sum(L.tri_count(o.data) for o in visual), "(budget 1
 print("unique meshes:", len({o.data.name for o in visual}), "| rocks over 2k tris:", over or "none")
 print("images:", [(i.name, tuple(i.size)) for i in bpy.data.images if i.size[0]])
 
+bpy.context.window.scene = bpy.data.scenes["Scene"]  # the level; the character has its own scene
 bpy.ops.object.select_all(action="DESELECT")
 bpy.ops.export_scene.gltf(
     filepath=OUT,
     export_format="GLB",
     use_selection=False,
+    use_active_scene=True,
     export_apply=True,
     export_yup=True,
     export_extras=True,  # custom properties -> userData (surface, checkpoint, finish)
