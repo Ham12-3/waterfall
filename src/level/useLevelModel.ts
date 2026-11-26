@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
 import {
+  DoubleSide,
   Group,
   Mesh,
   Quaternion,
@@ -40,6 +41,8 @@ export interface LevelModel {
  * colour texture) and a response to the sky lighting. Wet rock is made glossy
  * so it mirrors the sky; moss and dry rock stay matt.
  */
+const isFoliage = (material: Material) => /fern|anthurium/i.test(material.name)
+
 function enhanceMaterials(scene: Object3D) {
   const done = new Set<Material>()
   scene.traverse((child) => {
@@ -50,6 +53,12 @@ function enhanceMaterials(scene: Object3D) {
     if (!look) return
     material.roughness = look.roughness
     material.color.set(look.tint)
+    if (isFoliage(material)) {
+      // Leaves are cut out by alpha and seen from both sides.
+      material.transparent = false
+      material.alphaTest = 0.5
+      material.side = DoubleSide
+    }
     material.envMapIntensity = look.reflect
     if (material.map && !material.normalMap) {
       material.map.anisotropy = 8
@@ -122,7 +131,8 @@ export function useLevelModel(): LevelModel {
       if (!merged) throw new Error(`Could not merge level geometry for material ${material.name}`)
       const mesh = new Mesh(merged, material)
       mesh.name = `Level_${material.name}`
-      mesh.castShadow = true
+      // Plants skip the shadow pass: 40,000 thin triangles for little visible gain.
+      mesh.castShadow = !isFoliage(material)
       mesh.receiveShadow = true
       visuals.add(mesh)
     }

@@ -83,9 +83,11 @@ export const CONFIG = {
    */
   sunPosition: [20, 22, 13] as Vec3,
   sunColor: '#ffe3c2',
-  sunIntensity: 2.3,
+  sunIntensity: 2.8,
   /** How strongly the sky panorama lights the scene (image-based lighting). */
-  environmentIntensity: 0.68,
+  environmentIntensity: 1.25,
+  /** Turns the HDRI so its sun sits on the same side as the scene's sun. */
+  environmentYaw: 0,
   /** Starting values for the waterfall shader; live-tunable in leva (dev only). */
   waterfall: {
     speed: 1.15,
@@ -124,13 +126,15 @@ export const CONFIG = {
    * map, and a colour multiplied over the texture. Order matters: the first match wins.
    */
   surfaceLook: {
-    WetTop: { roughness: 0.12, reflect: 1.6, relief: 2.2, tint: '#7d8890' },
-    Wet: { roughness: 0.28, reflect: 1.3, relief: 2.6, tint: '#929ba1' },
+    WetTop: { roughness: 0.12, reflect: 1.6, relief: 2.2, tint: '#a7b0b6' },
+    Wet: { roughness: 0.28, reflect: 1.3, relief: 2.6, tint: '#c3cace' },
     DryTop: { roughness: 0.82, reflect: 0.7, relief: 2.6, tint: '#8d8a83' },
     Dry: { roughness: 0.9, reflect: 0.6, relief: 2.8, tint: '#7d7a74' },
     Moss: { roughness: 1.0, reflect: 0.35, relief: 3.2, tint: '#dfe6d2' },
     PoolFloor: { roughness: 0.6, reflect: 0.8, relief: 3.0, tint: '#c9c2b6' },
     Bark: { roughness: 0.75, reflect: 0.6, relief: 3.4, tint: '#e6dccf' },
+    fern: { roughness: 0.7, reflect: 0.5, relief: 0, tint: '#ffffff' },
+    anthurium: { roughness: 0.45, reflect: 0.9, relief: 0, tint: '#ffffff' },
   },
   /** Logs drifting down the face of the falls. */
   logs: {

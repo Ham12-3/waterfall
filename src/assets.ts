@@ -1,6 +1,8 @@
 /** Paths of game-ready assets in /public/assets. Sources are logged in assets-src/manifest.json. */
 export const ASSETS = {
   sky: '/assets/textures/sky_panorama.webp',
+  /** Poly Haven 'Stream' HDRI (CC0), used for lighting and reflections only. */
+  environment: '/assets/textures/env_stream_1k.hdr',
   foamMask: '/assets/textures/foam.webp',
   splashFlipbook: '/assets/textures/splash_flipbook.webp',
   basalt: '/assets/textures/basalt.webp',

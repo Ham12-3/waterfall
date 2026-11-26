@@ -1,6 +1,5 @@
-import { useMemo } from 'react'
 import { Environment, useTexture } from '@react-three/drei'
-import { BackSide, EquirectangularReflectionMapping, SRGBColorSpace } from 'three'
+import { BackSide, SRGBColorSpace } from 'three'
 import { ASSETS } from '../assets'
 import { CONFIG } from '../config'
 
@@ -12,21 +11,19 @@ import { CONFIG } from '../config'
 export function Sky() {
   const map = useTexture(ASSETS.sky)
   map.colorSpace = SRGBColorSpace
-  // The same painting lights the scene, so rocks, water and the character pick
-  // up the sky's colours and wet surfaces have something to reflect.
-  const environment = useMemo(() => {
-    const texture = map.clone()
-    texture.mapping = EquirectangularReflectionMapping
-    texture.needsUpdate = true
-    return texture
-  }, [map])
   return (
     <>
       <mesh name="Sky" rotation-y={Math.PI / 2} renderOrder={-1}>
         <sphereGeometry args={[220, 48, 24]} />
         <meshBasicMaterial map={map} side={BackSide} fog={false} depthWrite={false} toneMapped={false} />
       </mesh>
-      <Environment map={environment} environmentIntensity={CONFIG.environmentIntensity} environmentRotation={[0, Math.PI / 2, 0]} />
+      {/* A photographic HDRI lights the scene and gives wet rock and water real
+          surroundings to reflect; the painted panorama stays as the visible sky. */}
+      <Environment
+        files={ASSETS.environment}
+        environmentIntensity={CONFIG.environmentIntensity}
+        environmentRotation={[0, CONFIG.environmentYaw, 0]}
+      />
     </>
   )
 }

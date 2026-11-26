@@ -136,7 +136,7 @@
       "date": "2026-11-26",
       "prompt": "Built procedurally with Python through the MCP for Blender addon. Scripts: assets-src/blender/cascade_lib.py and step1_materials_cliff.py, step2_rocks.py, step3_ground_logs_sheet.py, step4_export.py. Layout comes from assets-src/level_layout.json, which is generated from src/level/greybox.ts.",
       "contents": "Cliff_Main, 14 ledges + 2 stepping stones + 6 boulders as instances of five rock shapes (Rock_A to Rock_E, 1,536 tris each), Summit, Bank_L, Bank_R, Shore, Pool_Basin, Log_A, Log_B, Waterfall_Sheet (UVs top to bottom), and 30 box colliders named <Object>_COL with surface / checkpoint / finish custom properties.",
-      "budget": "45,964 visual triangles (budget 150,000); textures 1024 px; glb about 1.0 MB with Draco meshes and WebP textures.",
+      "budget": "88,277 visual triangles including foliage (budget 150,000); textures 1024 px; glb about 1.4 MB with Draco meshes and WebP textures.",
       "usedIn": "The whole playable level (src/level/useLevelModel.ts, Level.tsx, Logs.tsx, waterfall/Waterfall.tsx)"
     },
     {
@@ -147,6 +147,23 @@
       "prompt": "No prompt. Mixamo stock character 'Megan' (FBX Binary, T-pose) with the animations 'Idle', 'Running' (In Place), 'Jump' (Jumping In Place), 'Falling Idle' and 'Falling To Landing', each downloaded as FBX, Without Skin, 30 fps, no keyframe reduction.",
       "processing": "Blender (assets-src/blender/char1_import.py, char2_animations.py, char3_optimize_export.py): clips joined onto one armature as actions Idle / Run / Jump / Fall / Land on separate NLA tracks; upward hip travel removed from Jump and Land so physics alone moves the player; meshes decimated from 54,961 to 14,405 triangles and joined; textures reduced from 4096 / 2048 to 1024; exported as Draco glb with WebP textures.",
       "usedIn": "The player (src/components/Character.tsx)"
+    },
+    {
+      "file": "Poly Haven HDRI 'Stream' (stream_1k), CC0, by Greg Zaal - https://polyhaven.com/a/stream",
+      "gameFile": "public/assets/textures/env_stream_1k.hdr",
+      "tool": "Poly Haven",
+      "date": "2026-11-26",
+      "prompt": "No prompt. Downloaded at 1k through the Blender MCP addon's Poly Haven integration and saved out of Blender as .hdr.",
+      "usedIn": "Image-based lighting and reflections (src/components/Sky.tsx). The painted Flow panorama remains the visible sky."
+    },
+    {
+      "file": "Poly Haven models 'Fern 02' and 'Anthurium Botany 01', CC0, by Rico Cilliers and Rob Tuytel - https://polyhaven.com/a/fern_02 , https://polyhaven.com/a/anthurium_botany_01",
+      "gameFile": "public/assets/models/level.glb",
+      "tool": "Poly Haven + Blender",
+      "date": "2026-11-26",
+      "prompt": "No prompt. Downloaded at 1k (.blend) through the Blender MCP addon into a 'Foliage_Source' scene in cascade.blend.",
+      "processing": "assets-src/blender/foliage2_place.py scatters 52 linked instances (scaled 3.2x to 5.2x, since the source plants are knee-high) on the banks, outer shore, water's edge, cliff top, summit and the back of mossy ledges. About 42,000 triangles; no colliders.",
+      "usedIn": "Level foliage, merged per material at load and excluded from the shadow pass (src/level/useLevelModel.ts)"
     }
   ]
 }
