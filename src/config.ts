@@ -71,8 +71,9 @@ export const CONFIG = {
     shakeDecay: 6,
   },
   effects: {
-    splashDuration: 0.7,
-    splashRadius: 2.6,
+    splashDuration: 0.9,
+    /** Width and height of the splash flipbook quad, in metres. */
+    splashSize: [4.6, 2.3] as [number, number],
   },
   /** Directional light position; the pool glint uses the same direction. */
   sunPosition: [12, 30, 14] as Vec3,

@@ -98,6 +98,35 @@
       "date": "2026-11-26",
       "prompt": "Character reference sheet (turnaround) for a 3D video game model. One athletic young adult adventurer shown three times at the same scale in a row: front view, side profile view, and back view. Standing upright in a strict T-pose with arms straight out horizontally and legs slightly apart, neutral expression. Simple practical outdoor clothes: fitted rust-orange short-sleeve shirt, dark olive cargo trousers, sturdy brown hiking boots, short dark hair, no backpack, no weapons, no accessories. Full body visible head to toe in every view, feet on the same baseline. Plain flat mid-grey background, even flat studio lighting, no shadows, no text, no labels. Stylised realism like a modern adventure game character.",
       "usedIn": "Modelling / image-to-3D reference for the player character (Phase 6)"
+    },
+    {
+      "file": "assets-src/raw/video_waterfall_distant.mp4",
+      "gameFile": "public/assets/video/waterfall_distant_loop.mp4",
+      "tool": "Flow video",
+      "model": "Veo 3.1 Fast (720p, 8s, 20 credits)",
+      "date": "2026-11-26",
+      "prompt": "Static locked-off tripod shot, camera does not move at all, no zoom, no pan. A very distant tall tropical waterfall seen from far away across a misty jungle valley, a thin white ribbon of water falling continuously down a dark basalt cliff in the centre of the frame, surrounded by dense green jungle hills. Soft morning haze, gentle drifting mist at the base of the falls, faint god rays, a few leaves swaying very slightly. Nothing else changes: no people, no animals, no birds, no clouds moving quickly, constant lighting from start to finish so the clip loops seamlessly. Stylised realism, painterly, like a modern adventure game. Ambient waterfall sound only, no music, no speech.",
+      "processing": "ffmpeg: last second cross-faded into the first second for a seamless 6.9 s loop, audio removed, H.264 CRF 25, 1280x720, 1.0 MB.",
+      "usedIn": "Title screen backdrop and distant background plane (Phase 7)"
+    },
+    {
+      "file": "assets-src/raw/video_splash.mp4",
+      "gameFile": "public/assets/textures/splash_flipbook.webp",
+      "tool": "Flow video",
+      "model": "Veo 3.1 Fast (720p, 8s, 20 credits)",
+      "date": "2026-11-26",
+      "prompt": "Visual effects element on a pure solid black background. Static locked-off camera, side view at water level. A single burst of white water splashes straight upward from the bottom centre of the frame, as if a heavy object has just dropped into water: a crown-shaped splash rises, spreads into droplets and fine spray, then falls back down and fades away completely to empty black by the end. Only white water and spray are visible, no water surface, no pool, no object, no ground, no horizon, no reflections. The background stays perfectly black the whole time. High contrast, crisp droplets, slow enough to see the shape clearly. No sound needed.",
+      "notes": "The clip shows a waterline with an underwater plume despite the prompt. Only the region above the waterline is used, so no second attempt was spent.",
+      "processing": "ffmpeg: 1.3 s to 4.0 s, cropped to 744x372 above the waterline, desaturated, blacks crushed, 16 frames tiled 4x4 into a 1024x512 sprite sheet (256x128 cells).",
+      "usedIn": "Pool splash flipbook (src/components/Splash.tsx)"
+    },
+    {
+      "file": "assets-src/raw/video_jump_reference.mp4",
+      "tool": "Flow video",
+      "model": "Veo 3.1 Fast (720p, 8s, 20 credits)",
+      "date": "2026-11-26",
+      "prompt": "Animation reference footage. Static locked-off camera, exact side view, wide enough that the whole body stays in frame from head to feet for the entire clip. An athletic adult in a plain rust-orange t-shirt, dark olive trousers and hiking boots runs from the left across a large flat rock, takes off from its edge with one foot, makes a clear running jump across a gap of about two metres, lands on a second flat rock on the right, absorbs the landing with bent knees and stands up. One continuous take, real-time speed, natural athletic movement, no slow motion, no cuts, no camera movement. Plain uncluttered outdoor background with soft even daylight so the silhouette is easy to read. No music, no speech.",
+      "usedIn": "Animation reference / possible video-mocap input for the jump (Phase 6). Not shipped in the game."
     }
   ]
 }

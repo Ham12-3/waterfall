@@ -1,4 +1,4 @@
-import { Color, DoubleSide, ShaderMaterial, Vector2, Vector3 } from 'three'
+import { Color, DoubleSide, ShaderMaterial, Vector2, Vector3, type Texture } from 'three'
 import { CONFIG } from '../../config'
 import { NOISE_GLSL } from './noise'
 
@@ -99,12 +99,14 @@ export function createFallMaterial(streakScale: [number, number], baseFoam: numb
 }
 
 /** Churning foam lying on the pool where the fall lands. */
-export function createFoamMaterial() {
+export function createFoamMaterial(foamMask: Texture) {
   return new ShaderMaterial({
     transparent: true,
     depthWrite: false,
     uniforms: {
       uTime: { value: 0 },
+      /** Tileable black-and-white foam pattern (Flow texture). */
+      uFoamMask: { value: foamMask },
       uSpeed: { value: W.speed },
       uFoam: { value: W.foam },
     },
@@ -119,14 +121,17 @@ export function createFoamMaterial() {
       uniform float uTime;
       uniform float uSpeed;
       uniform float uFoam;
+      uniform sampler2D uFoamMask;
       varying vec2 vUv;
       ${NOISE_GLSL}
 
       void main() {
         float t = uTime * uSpeed * 0.35;
-        // Foam drifts away from the fall (towards v = 0).
-        float n = vnoise(vec2(vUv.x * 26.0, vUv.y * 7.0 + t)) * 0.6
-                + vnoise(vec2(vUv.x * 60.0 + 7.0, vUv.y * 16.0 + t * 1.7)) * 0.4;
+        // Foam drifts away from the fall (towards v = 0). Two copies of the
+        // painted foam pattern slide at different speeds, broken up by noise.
+        float painted = texture2D(uFoamMask, vec2(vUv.x * 4.0, vUv.y + t * 0.5)).r * 0.6
+                      + texture2D(uFoamMask, vec2(vUv.x * 2.3 + 0.37, vUv.y * 0.6 + t * 0.28)).r * 0.4;
+        float n = mix(vnoise(vec2(vUv.x * 26.0, vUv.y * 7.0 + t)), painted, 0.7);
         // Densest against the fall, breaking up towards the open pool and the ends.
         float density = smoothstep(0.0, 1.0, vUv.y) * smoothstep(0.0, 0.12, vUv.x) * smoothstep(0.0, 0.12, 1.0 - vUv.x);
         float foam = smoothstep(1.0 - density * (0.55 + uFoam * 0.45), 1.0 - density * 0.3, n);

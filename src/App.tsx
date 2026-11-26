@@ -7,6 +7,7 @@ import { CameraRig } from './components/CameraRig'
 import { HUD } from './components/HUD'
 import { Level } from './components/Level'
 import { Player } from './components/Player'
+import { Sky } from './components/Sky'
 import { Splash } from './components/Splash'
 import { Waterfall } from './components/waterfall/Waterfall'
 import { CONFIG } from './config'
@@ -41,8 +42,11 @@ export default function App() {
             <CameraRig />
           </Physics>
         </Suspense>
-        <Splash />
-        <Waterfall />
+        <Suspense fallback={null}>
+          <Sky />
+          <Splash />
+          <Waterfall />
+        </Suspense>
       </Canvas>
       <HUD />
       <Leva hidden={!import.meta.env.DEV} collapsed />

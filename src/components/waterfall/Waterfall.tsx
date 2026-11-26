@@ -1,8 +1,9 @@
 import { useEffect, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { MeshReflectorMaterial } from '@react-three/drei'
+import { MeshReflectorMaterial, useTexture } from '@react-three/drei'
 import { useControls } from 'leva'
-import { PlaneGeometry, type Color } from 'three'
+import { PlaneGeometry, RepeatWrapping, type Color } from 'three'
+import { ASSETS } from '../../assets'
 import { CONFIG } from '../../config'
 import { POOL, WATERFALL, WATER_COLUMNS } from '../../level/greybox'
 import { createFallMaterial, createFoamMaterial, createPoolMaterial } from './materials'
@@ -45,15 +46,18 @@ export function Waterfall() {
     { collapsed: true },
   )
 
+  const foamMask = useTexture(ASSETS.foamMask)
+  foamMask.wrapS = foamMask.wrapT = RepeatWrapping
+
   const sheetGeometry = useMemo(buildSheetGeometry, [])
   const materials = useMemo(
     () => ({
       sheet: createFallMaterial([30, 5], 0.06),
       column: createFallMaterial([7, 2.2], 0.16),
-      foam: createFoamMaterial(),
+      foam: createFoamMaterial(foamMask),
       pool: createPoolMaterial(),
     }),
-    [],
+    [foamMask],
   )
 
   useEffect(
