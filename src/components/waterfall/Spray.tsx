@@ -1,46 +1,61 @@
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Object3D, type InstancedMesh } from 'three'
+import { BufferAttribute, BufferGeometry, type PerspectiveCamera } from 'three'
 import { CONFIG } from '../../config'
 import { WATERFALL, WATER_COLUMNS } from '../../level/greybox'
 import { sprayBursts } from '../../state/effects'
+import { createSpriteMaterial } from './materials'
 
 const S = CONFIG.spray
 const F = CONFIG.waterfall
 const rand = (min: number, max: number) => min + Math.random() * (max - min)
 
 /**
- * One instanced mesh for every spray droplet: the constant churn along the
- * foot of the fall and under each column, plus gameplay bursts.
+ * Every spray droplet in one draw call of soft point sprites: the constant
+ * churn along the foot of the fall and under each column, plus gameplay
+ * bursts. Droplets start small and bright and swell into faint mist as they age.
  */
 export function Spray() {
-  const mesh = useRef<InstancedMesh>(null)
-  const dummy = useMemo(() => new Object3D(), [])
-  const sim = useMemo(
-    () => ({
-      pos: new Float32Array(S.count * 3),
+  const material = useMemo(() => createSpriteMaterial('#ffffff', S.opacity), [])
+  const { geometry, sim } = useMemo(() => {
+    const geometry = new BufferGeometry()
+    geometry.setAttribute('position', new BufferAttribute(new Float32Array(S.count * 3), 3))
+    geometry.setAttribute('aSize', new BufferAttribute(new Float32Array(S.count), 1))
+    geometry.setAttribute('aAlpha', new BufferAttribute(new Float32Array(S.count), 1))
+    const sim = {
       vel: new Float32Array(S.count * 3),
       life: new Float32Array(S.count),
       maxLife: new Float32Array(S.count).fill(1),
+      size: new Float32Array(S.count),
       next: 0,
       baseDebt: 0,
       columnDebt: 0,
-    }),
-    [],
+    }
+    return { geometry, sim }
+  }, [])
+
+  useEffect(
+    () => () => {
+      geometry.dispose()
+      material.dispose()
+    },
+    [geometry, material],
   )
 
-  const spawn = (x: number, y: number, z: number, vx: number, vy: number, vz: number, life: number) => {
+  const spawn = (x: number, y: number, z: number, vx: number, vy: number, vz: number, life: number, size: number) => {
     const i = sim.next
     sim.next = (i + 1) % S.count
-    sim.pos.set([x, y, z], i * 3)
+    ;(geometry.attributes.position as BufferAttribute).setXYZ(i, x, y, z)
     sim.vel.set([vx, vy, vz], i * 3)
     sim.life[i] = sim.maxLife[i] = life
+    sim.size[i] = size
   }
 
-  useFrame((_, rawDt) => {
-    const inst = mesh.current
-    if (!inst) return
+  useFrame((state, rawDt) => {
     const dt = Math.min(rawDt, 1 / 30)
+    const position = geometry.attributes.position as BufferAttribute
+    const size = geometry.attributes.aSize as BufferAttribute
+    const alpha = geometry.attributes.aAlpha as BufferAttribute
 
     // Constant spray along the foot of the main fall.
     sim.baseDebt += S.baseRate * WATERFALL.width * dt
@@ -48,7 +63,7 @@ export function Spray() {
       sim.baseDebt -= 1
       const u = rand(-1, 1)
       const z = WATERFALL.z + F.lean + F.bulge * (1 - u * u)
-      spawn((u * WATERFALL.width) / 2, WATERFALL.bottomY, z, rand(-0.8, 0.8), rand(1.5, 4.5), rand(0.3, 2.4), rand(0.5, 1))
+      spawn((u * WATERFALL.width) / 2, WATERFALL.bottomY, z, rand(-0.9, 0.9), rand(1.2, 4.8), rand(0.2, 2.6), rand(0.6, 1.3), rand(S.minSize, S.maxSize))
     }
 
     // Splatter where each column hits its ledge.
@@ -58,7 +73,7 @@ export function Spray() {
       for (const c of WATER_COLUMNS) {
         const angle = rand(0, Math.PI * 2)
         const out = rand(0.8, 2.2)
-        spawn(c.x, c.bottomY + 0.05, c.z, Math.cos(angle) * out, rand(1.2, 3), Math.sin(angle) * out, rand(0.35, 0.7))
+        spawn(c.x, c.bottomY + 0.05, c.z, Math.cos(angle) * out, rand(1.2, 3), Math.sin(angle) * out, rand(0.4, 0.8), rand(S.minSize, S.maxSize) * 0.8)
       }
     }
 
@@ -67,33 +82,34 @@ export function Spray() {
       for (let k = 0; k < b.count; k++) {
         const angle = rand(0, Math.PI * 2)
         const out = rand(0.3, 1) * b.speed
-        spawn(b.x, b.y, b.z, Math.cos(angle) * out, rand(0.6, 1.2) * b.speed, Math.sin(angle) * out, rand(0.4, 0.8))
+        spawn(b.x, b.y, b.z, Math.cos(angle) * out, rand(0.6, 1.2) * b.speed, Math.sin(angle) * out, rand(0.45, 0.9), rand(S.minSize, S.maxSize))
       }
     }
 
+    const drag = Math.exp(-S.drag * dt)
     for (let i = 0; i < S.count; i++) {
-      const j = i * 3
-      if (sim.life[i] > 0) {
-        sim.life[i] -= dt
-        sim.vel[j + 1] += S.gravity * dt
-        sim.pos[j] += sim.vel[j] * dt
-        sim.pos[j + 1] += sim.vel[j + 1] * dt
-        sim.pos[j + 2] += sim.vel[j + 2] * dt
+      if (sim.life[i] <= 0) {
+        alpha.setX(i, 0)
+        continue
       }
-      const alive = sim.life[i] > 0
-      dummy.position.set(sim.pos[j], sim.pos[j + 1], sim.pos[j + 2])
-      // Droplets shrink as they age; dead ones collapse to nothing.
-      dummy.scale.setScalar(alive ? S.size * (0.4 + 0.6 * (sim.life[i] / sim.maxLife[i])) : 0)
-      dummy.updateMatrix()
-      inst.setMatrixAt(i, dummy.matrix)
+      sim.life[i] -= dt
+      const j = i * 3
+      // Air drag slows droplets quickly, so they hang as mist instead of arcing like pebbles.
+      sim.vel[j] *= drag
+      sim.vel[j + 2] *= drag
+      sim.vel[j + 1] = sim.vel[j + 1] * drag + S.gravity * dt
+      position.setXYZ(i, position.getX(i) + sim.vel[j] * dt, position.getY(i) + sim.vel[j + 1] * dt, position.getZ(i) + sim.vel[j + 2] * dt)
+      const age = 1 - Math.max(0, sim.life[i]) / sim.maxLife[i]
+      size.setX(i, sim.size[i] * (1 + age * S.growth))
+      alpha.setX(i, Math.min(1, age * 8) * (1 - age) ** 1.5)
     }
-    inst.instanceMatrix.needsUpdate = true
+    position.needsUpdate = true
+    size.needsUpdate = true
+    alpha.needsUpdate = true
+
+    const camera = state.camera as PerspectiveCamera
+    material.uniforms.uPixelScale.value = (state.size.height * state.viewport.dpr) / (2 * Math.tan((camera.fov * Math.PI) / 360))
   })
 
-  return (
-    <instancedMesh ref={mesh} args={[undefined, undefined, S.count]} frustumCulled={false} renderOrder={6}>
-      <icosahedronGeometry args={[1, 0]} />
-      <meshBasicMaterial color="#ffffff" transparent opacity={0.85} depthWrite={false} />
-    </instancedMesh>
-  )
+  return <points geometry={geometry} material={material} frustumCulled={false} renderOrder={6} />
 }

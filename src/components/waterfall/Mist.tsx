@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { BufferAttribute, BufferGeometry, type PerspectiveCamera } from 'three'
 import { CONFIG } from '../../config'
 import { WATERFALL } from '../../level/greybox'
-import { createMistMaterial } from './materials'
+import { createSpriteMaterial } from './materials'
 
 const M = CONFIG.mist
 const rand = (min: number, max: number) => min + Math.random() * (max - min)
@@ -11,7 +11,7 @@ const BASE_Z = WATERFALL.z + CONFIG.waterfall.lean
 
 /** Soft sprites that rise and drift off the base of the fall, fading in and out. */
 export function Mist() {
-  const material = useMemo(createMistMaterial, [])
+  const material = useMemo(() => createSpriteMaterial(M.color, M.opacity), [])
   const { geometry, puffs } = useMemo(() => {
     const geometry = new BufferGeometry()
     geometry.setAttribute('position', new BufferAttribute(new Float32Array(M.count * 3), 3))

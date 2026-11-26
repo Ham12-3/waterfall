@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { MeshReflectorMaterial, useTexture } from '@react-three/drei'
 import { useControls } from 'leva'
-import { RepeatWrapping, type Color } from 'three'
+import { RepeatWrapping, SRGBColorSpace, type Color } from 'three'
 import { ASSETS } from '../../assets'
 import { CONFIG } from '../../config'
 import { POOL, WATERFALL, WATER_COLUMNS } from '../../level/greybox'
@@ -32,24 +32,29 @@ export function Waterfall() {
 
   const foamMask = useTexture(ASSETS.foamMask)
   foamMask.wrapS = foamMask.wrapT = RepeatWrapping
+  const sky = useTexture(ASSETS.sky)
+  sky.colorSpace = SRGBColorSpace
 
   // The curved sheet mesh is modelled in Blender, with UVs running top to bottom.
   const { sheetGeometry } = useLevelModel()
   const materials = useMemo(
     () => ({
-      sheet: createFallMaterial([30, 5], 0.06),
-      column: createFallMaterial([7, 2.2], 0.16),
+      sheet: createFallMaterial([30, 5], 0.07),
+      // A second, thinner layer in front: its different pattern sliding over
+      // the main sheet gives the fall depth.
+      veil: createFallMaterial([19, 3.6], 0.1, 37.0, 0.42),
+      column: createFallMaterial([7, 2.2], 0.16, 11.0),
       foam: createFoamMaterial(foamMask),
-      pool: createPoolMaterial(),
+      pool: createPoolMaterial(sky, WATERFALL.z + F.lean, POOL.center[2] + POOL.size[1] / 2),
     }),
-    [foamMask],
+    [foamMask, sky],
   )
 
   useEffect(() => () => Object.values(materials).forEach((m) => m.dispose()), [materials])
 
   // Push leva values into the shader uniforms.
   useEffect(() => {
-    for (const fall of [materials.sheet, materials.column]) {
+    for (const fall of [materials.sheet, materials.veil, materials.column]) {
       const u = fall.uniforms
       u.uSpeed.value = controls.speed
       ;(u.uColor.value as Color).set(controls.color)
@@ -65,6 +70,7 @@ export function Waterfall() {
   useFrame(({ clock }) => {
     const t = clock.elapsedTime
     materials.sheet.uniforms.uTime.value = t
+    materials.veil.uniforms.uTime.value = t * 1.12
     materials.column.uniforms.uTime.value = t
     materials.foam.uniforms.uTime.value = t
     materials.pool.uniforms.uTime.value = t
@@ -108,6 +114,13 @@ export function Waterfall() {
         geometry={sheetGeometry}
         material={materials.sheet}
         renderOrder={3}
+      />
+      <mesh
+        name="Waterfall_Veil"
+        geometry={sheetGeometry}
+        material={materials.veil}
+        position={[0, 0, 0.22]}
+        renderOrder={4}
       />
 
       {WATER_COLUMNS.map((column, i) => {

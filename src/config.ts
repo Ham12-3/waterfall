@@ -77,13 +77,21 @@ export const CONFIG = {
   },
   /** Light haze; the colour matches the horizon of the sky panorama. */
   fog: { color: '#d8cbc6', near: 45, far: 160 },
-  /** Directional light position; the pool glint uses the same direction. */
-  sunPosition: [12, 30, 14] as Vec3,
+  /**
+   * Low morning sun, on the same side as the sun in the sky panorama. The pool
+   * glitter and the waterfall highlights use the same direction and colour.
+   */
+  sunPosition: [20, 22, 13] as Vec3,
+  sunColor: '#ffe3c2',
+  sunIntensity: 2.3,
+  /** How strongly the sky panorama lights the scene (image-based lighting). */
+  environmentIntensity: 0.68,
   /** Starting values for the waterfall shader; live-tunable in leva (dev only). */
   waterfall: {
-    speed: 1.3,
-    color: '#8fd0e6',
-    deepColor: '#2f7fa6',
+    speed: 1.15,
+    /** Tint of thin, unaerated water; thick water is always white. */
+    color: '#b9dedd',
+    deepColor: '#4a8f96',
     foam: 0.55,
     opacity: 0.8,
     /** Vertex ripple depth in metres. */
@@ -110,6 +118,20 @@ export const CONFIG = {
     /** Seconds the landing clip holds before run / idle take over. */
     landHold: 0.28,
   },
+  /**
+   * How each level material (matched by a word in its Blender name) responds to
+   * light: roughness, strength of sky reflections, depth of the generated normal
+   * map, and a colour multiplied over the texture. Order matters: the first match wins.
+   */
+  surfaceLook: {
+    WetTop: { roughness: 0.12, reflect: 1.6, relief: 2.2, tint: '#7d8890' },
+    Wet: { roughness: 0.28, reflect: 1.3, relief: 2.6, tint: '#929ba1' },
+    DryTop: { roughness: 0.82, reflect: 0.7, relief: 2.6, tint: '#8d8a83' },
+    Dry: { roughness: 0.9, reflect: 0.6, relief: 2.8, tint: '#7d7a74' },
+    Moss: { roughness: 1.0, reflect: 0.35, relief: 3.2, tint: '#dfe6d2' },
+    PoolFloor: { roughness: 0.6, reflect: 0.8, relief: 3.0, tint: '#c9c2b6' },
+    Bark: { roughness: 0.75, reflect: 0.6, relief: 3.4, tint: '#e6dccf' },
+  },
   /** Logs drifting down the face of the falls. */
   logs: {
     count: 3,
@@ -131,18 +153,19 @@ export const CONFIG = {
     jumpMultiplier: 0.75,
   },
   pool: {
-    shallowColor: '#4f9db8',
-    deepColor: '#1d5673',
-    skyColor: '#cfe2ec',
-    rippleStrength: 0.16,
+    shallowColor: '#3f8f86',
+    deepColor: '#0f3d45',
+    /** What the water mirrors where the reflection runs into the cliff. */
+    cliffReflection: '#2b3236',
+    rippleStrength: 0.11,
   },
   mist: {
-    count: 36,
+    count: 44,
     color: '#eef6f9',
     /** Low, because blending happens in linear light under the post-processing composer. */
-    opacity: 0.045,
-    minSize: 4,
-    maxSize: 9,
+    opacity: 0.03,
+    minSize: 5,
+    maxSize: 11,
   },
   post: {
     bloomIntensity: 0.2,
@@ -169,16 +192,24 @@ export const CONFIG = {
     landGain: 0.5,
   },
   spray: {
-    /** Size of the shared particle pool. */
-    count: 280,
-    /** Particles per second per metre along the base of the fall. */
-    baseRate: 9,
-    /** Particles per second at the foot of each water column. */
-    columnRate: 22,
-    gravity: -12,
-    size: 0.07,
-    /** Particles thrown up when landing on wet stone / falling in the pool. */
+    /** Size of the shared droplet pool. */
+    count: 420,
+    /** Droplets per second per metre along the base of the fall. */
+    baseRate: 14,
+    /** Droplets per second at the foot of each water column. */
+    columnRate: 26,
+    gravity: -7,
+    /** Air drag per second; high, so spray hangs instead of arcing. */
+    drag: 1.6,
+    /** Droplet sprite size in metres when launched. */
+    minSize: 0.18,
+    maxSize: 0.45,
+    /** How many times larger a droplet has swollen by the end of its life. */
+    growth: 2.4,
+    opacity: 0.2,
+    /** Droplets thrown up when landing on wet stone / falling in the pool. */
     landingBurst: 14,
     poolBurst: 40,
   },
+
 } as const

@@ -1,8 +1,20 @@
 import { useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
-import { Group, Mesh, Quaternion, Vector3, type BufferGeometry, type Material, type Object3D } from 'three'
+import {
+  Group,
+  Mesh,
+  Quaternion,
+  Vector2,
+  Vector3,
+  type BufferGeometry,
+  type Material,
+  type MeshStandardMaterial,
+  type Object3D,
+} from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { ASSETS, DRACO_PATH } from '../assets'
+import { CONFIG } from '../config'
+import { normalFromAlbedo } from '../utils/normalFromAlbedo'
 import type { BlockData } from './greybox'
 
 export interface BoxCollider extends BlockData {
@@ -24,6 +36,34 @@ export interface LevelModel {
 }
 
 /**
+ * Gives each level material surface relief (a normal map derived from its own
+ * colour texture) and a response to the sky lighting. Wet rock is made glossy
+ * so it mirrors the sky; moss and dry rock stay matt.
+ */
+function enhanceMaterials(scene: Object3D) {
+  const done = new Set<Material>()
+  scene.traverse((child) => {
+    const material = (child as Mesh).material as MeshStandardMaterial | undefined
+    if (!material || !material.isMeshStandardMaterial || done.has(material)) return
+    done.add(material)
+    const look = Object.entries(CONFIG.surfaceLook).find(([key]) => material.name.includes(key))?.[1]
+    if (!look) return
+    material.roughness = look.roughness
+    material.color.set(look.tint)
+    material.envMapIntensity = look.reflect
+    if (material.map && !material.normalMap) {
+      material.map.anisotropy = 8
+      const normalMap = normalFromAlbedo(material.map, look.relief)
+      if (normalMap) {
+        material.normalMap = normalMap
+        material.normalScale = new Vector2(1, 1)
+      }
+    }
+    material.needsUpdate = true
+  })
+}
+
+/**
  * Splits level.glb (built in Blender, see assets-src/blender) into the parts
  * the game treats differently. Naming rules: `*_COL` are colliders,
  * `Waterfall_Sheet` is the water, `Log_*` are moving props.
@@ -32,6 +72,7 @@ export function useLevelModel(): LevelModel {
   const { scene } = useGLTF(ASSETS.level, DRACO_PATH)
 
   return useMemo(() => {
+    enhanceMaterials(scene)
     const visuals = new Group()
     visuals.name = 'Level_Visuals'
     // Static geometry is baked into world space and grouped by material, so the

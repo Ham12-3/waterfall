@@ -31,10 +31,13 @@ export default function App() {
       <Canvas shadows dpr={[1, 1.5]} camera={{ fov: CONFIG.camera.fov, near: 0.1, far: 400 }}>
         <color attach="background" args={[CONFIG.fog.color]} />
         <fog attach="fog" args={[CONFIG.fog.color, CONFIG.fog.near, CONFIG.fog.far]} />
-        <hemisphereLight args={['#dfe9f2', '#55595e', 0.9]} />
+        <hemisphereLight args={['#dfe9f2', '#4b4f45', 0.25]} />
         <directionalLight
           position={CONFIG.sunPosition}
-          intensity={2}
+          color={CONFIG.sunColor}
+          intensity={CONFIG.sunIntensity}
+          shadow-bias={-0.0004}
+          shadow-normalBias={0.04}
           castShadow
           shadow-mapSize={[2048, 2048]}
           shadow-camera-left={-25}
