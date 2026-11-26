@@ -4,6 +4,8 @@ import { NOISE_GLSL } from './noise'
 
 const W = CONFIG.waterfall
 const sunDirection = () => new Vector3(...CONFIG.sunPosition).normalize()
+/** How many pool rocks the water shader can ripple and foam around. */
+export const MAX_POOL_ROCKS = 8
 
 /**
  * Falling water. UVs must run top (v = 1) to bottom (v = 0).
@@ -185,7 +187,9 @@ export function createFoamMaterial(foamMask: Texture) {
  * angle it mirrors the sky (sampled straight from the sky panorama) and the
  * dark cliff. Ripples spread out from where the fall lands.
  */
-export function createPoolMaterial(sky: Texture, fallLineZ: number, shoreZ: number) {
+export function createPoolMaterial(sky: Texture, fallLineZ: number, shoreZ: number, bankX: number, rocks: Vector3[]) {
+  // Fixed-size list for the shader: (x, z, radius) of each rock standing in the pool.
+  const rockList = Array.from({ length: MAX_POOL_ROCKS }, (_, i) => rocks[i] ?? new Vector3(0, 0, 0))
   return new ShaderMaterial({
     transparent: true,
     depthWrite: false,
@@ -201,6 +205,9 @@ export function createPoolMaterial(sky: Texture, fallLineZ: number, shoreZ: numb
       /** World Z of the foot of the fall and of the shore edge. */
       uFallZ: { value: fallLineZ },
       uShoreZ: { value: shoreZ },
+      /** |x| of the rock banks at either side of the pool. */
+      uBankX: { value: bankX },
+      uRocks: { value: rockList },
     },
     vertexShader: /* glsl */ `
       varying vec3 vWorld;
@@ -221,6 +228,8 @@ export function createPoolMaterial(sky: Texture, fallLineZ: number, shoreZ: numb
       uniform float uRipple;
       uniform float uFallZ;
       uniform float uShoreZ;
+      uniform float uBankX;
+      uniform vec3 uRocks[${MAX_POOL_ROCKS}];
       varying vec3 vWorld;
       ${NOISE_GLSL}
 
@@ -232,6 +241,15 @@ export function createPoolMaterial(sky: Texture, fallLineZ: number, shoreZ: numb
         // Rings pushed out by the falling water, fading with distance.
         float fromFall = max(0.0, p.y - uFallZ);
         h += 0.35 * sin(fromFall * 4.2 - uTime * 3.2 + vnoise(p * 0.7) * 4.0) * exp(-fromFall * 0.45);
+        // Rough, boiling water right where the fall lands.
+        h += 0.9 * (vnoise(p * 3.1 + vec2(0.0, -uTime * 1.6)) - 0.5) * exp(-fromFall * 0.9);
+        // Small rings lapping around every rock that breaks the surface.
+        for (int i = 0; i < ${MAX_POOL_ROCKS}; i++) {
+          vec3 rock = uRocks[i];
+          if (rock.z <= 0.0) continue;
+          float d = max(0.0, length(p - rock.xy) - rock.z);
+          h += 0.16 * sin(d * 9.0 - uTime * 2.4) * exp(-d * 1.7);
+        }
         return h;
       }
 
@@ -274,12 +292,27 @@ export function createPoolMaterial(sky: Texture, fallLineZ: number, shoreZ: numb
         float glint = pow(max(dot(reflect(-uSunDir, normal), viewDir), 0.0), 180.0);
         color += uSunColor * glint * 2.2;
 
-        // A thin, broken line of foam where the water laps the shore.
+        // A thin, broken line of foam where the water laps the shore and the banks.
         float lap = 1.0 - smoothstep(0.0, 0.45, abs(vWorld.z - uShoreZ + 0.55 + (h - 0.8) * 0.25));
-        color = mix(color, vec3(1.0), lap * smoothstep(0.75, 1.05, h) * 0.7);
+        lap = max(lap, 1.0 - smoothstep(0.0, 0.4, abs(uBankX - abs(vWorld.x) - 0.25 + (h - 0.8) * 0.25)));
+        float breakup = vnoise(p * 2.6 + vec2(uTime * 0.2, 0.0));
+        color = mix(color, vec3(1.0), lap * smoothstep(0.45, 0.8, breakup) * 0.6);
+
+        // Foam collars around the rocks, and churned white water under the fall.
+        float collar = 0.0;
+        for (int i = 0; i < ${MAX_POOL_ROCKS}; i++) {
+          vec3 rock = uRocks[i];
+          if (rock.z <= 0.0) continue;
+          float d = length(p - rock.xy) - rock.z;
+          collar = max(collar, 1.0 - smoothstep(-0.1, 0.32, d + (breakup - 0.5) * 0.35));
+        }
+        float fromFallLine = max(0.0, vWorld.z - uFallZ);
+        float churn = exp(-fromFallLine * 1.6) * smoothstep(0.45, 0.85, vnoise(p * 1.9 + vec2(0.0, -uTime * 0.9)) + exp(-fromFallLine * 2.2) * 0.6);
+        float white = max(collar * smoothstep(0.3, 0.7, breakup + collar * 0.4), churn);
+        color = mix(color, vec3(0.97, 0.99, 1.0), white * 0.9);
 
         // Straight down you see the bed through the water; edge-on it is a mirror.
-        float alpha = mix(0.5 + 0.38 * depth, 0.98, fresnel);
+        float alpha = max(mix(0.5 + 0.38 * depth, 0.98, fresnel), white * 0.95);
         gl_FragColor = vec4(color, alpha);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>

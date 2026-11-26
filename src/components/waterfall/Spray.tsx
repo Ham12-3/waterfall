@@ -2,13 +2,15 @@ import { useEffect, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { BufferAttribute, BufferGeometry, type PerspectiveCamera } from 'three'
 import { CONFIG } from '../../config'
-import { WATERFALL, WATER_COLUMNS } from '../../level/greybox'
+import { GREYBOX_BLOCKS, WATERFALL, WATER_COLUMNS } from '../../level/greybox'
 import { sprayBursts } from '../../state/effects'
 import { createSpriteMaterial } from './materials'
 
 const S = CONFIG.spray
 const F = CONFIG.waterfall
 const rand = (min: number, max: number) => min + Math.random() * (max - min)
+/** Ledges the falling sheet lands on: the water bursts into spray along their backs. */
+const LEDGES = GREYBOX_BLOCKS.filter((b) => b.name.startsWith('Ledge_'))
 
 /**
  * Every spray droplet in one draw call of soft point sprites: the constant
@@ -30,6 +32,7 @@ export function Spray() {
       next: 0,
       baseDebt: 0,
       columnDebt: 0,
+      ledgeDebt: 0,
     }
     return { geometry, sim }
   }, [])
@@ -75,6 +78,17 @@ export function Spray() {
         const out = rand(0.8, 2.2)
         spawn(c.x, c.bottomY + 0.05, c.z, Math.cos(angle) * out, rand(1.2, 3), Math.sin(angle) * out, rand(0.4, 0.8), rand(S.minSize, S.maxSize) * 0.8)
       }
+    }
+
+    // The sheet breaking over the back of each ledge.
+    sim.ledgeDebt += S.ledgeRate * LEDGES.length * dt
+    while (sim.ledgeDebt >= 1) {
+      sim.ledgeDebt -= 1
+      const ledge = LEDGES[Math.floor(Math.random() * LEDGES.length)]
+      const [lx, ly, lz] = ledge.position
+      const x = lx + rand(-0.5, 0.5) * ledge.size[0]
+      const z = Math.max(lz - ledge.size[2] / 2, WATERFALL.z) + 0.25
+      spawn(x, ly + ledge.size[1] / 2 + 0.05, z, rand(-0.6, 0.6), rand(0.8, 2.4), rand(0.4, 1.8), rand(0.4, 0.8), rand(S.minSize, S.maxSize) * 0.8)
     }
 
     // Gameplay bursts (landings, pool splashes).

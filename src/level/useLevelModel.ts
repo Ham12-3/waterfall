@@ -41,7 +41,53 @@ export interface LevelModel {
  * colour texture) and a response to the sky lighting. Wet rock is made glossy
  * so it mirrors the sky; moss and dry rock stay matt.
  */
-const isFoliage = (material: Material) => /fern|anthurium/i.test(material.name)
+const isFoliage = (material: Material) => /fern|anthurium|Tree/i.test(material.name)
+
+/** Animation clock for level shader effects; Waterfall advances it every frame. */
+export const levelTime = { value: 0 }
+
+/**
+ * Underwater treatment for the pool bed: a darker, greener tint below the
+ * surface and moving caustics, the bright wavy lines sunlight makes when it is
+ * focused by ripples. Above the water line the material is left alone.
+ */
+function addCaustics(material: MeshStandardMaterial) {
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uCausticTime = levelTime
+    shader.uniforms.uWaterY = { value: CONFIG.level.waterY }
+    shader.uniforms.uCausticStrength = { value: CONFIG.pool.caustics }
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vCausticWorld;')
+      .replace('#include <project_vertex>', '#include <project_vertex>\nvCausticWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;')
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        varying vec3 vCausticWorld;
+        uniform float uCausticTime;
+        uniform float uWaterY;
+        uniform float uCausticStrength;
+        float causticLines(vec2 q, float t) {
+          float a = 1.0 - abs(sin(q.x * 2.1 + sin(q.y * 1.7 + t * 0.9) * 1.3 + t * 0.6));
+          float b = 1.0 - abs(sin(q.y * 2.4 + sin(q.x * 1.9 - t * 0.7) * 1.4 - t * 0.5));
+          float c = 1.0 - abs(sin((q.x + q.y) * 1.6 + sin(q.x * 1.3 + t * 0.8) * 1.2));
+          return pow(a, 7.0) + pow(b, 7.0) + pow(c, 9.0) * 0.6;
+        }`,
+      )
+      .replace(
+        '#include <map_fragment>',
+        `#include <map_fragment>
+        float underwater = smoothstep(uWaterY + 0.05, uWaterY - 0.35, vCausticWorld.y);
+        diffuseColor.rgb *= mix(vec3(1.0), vec3(0.55, 0.78, 0.72), underwater);`,
+      )
+      .replace(
+        '#include <emissivemap_fragment>',
+        `#include <emissivemap_fragment>
+        totalEmissiveRadiance += diffuseColor.rgb * causticLines(vCausticWorld.xz * 0.85, uCausticTime) * uCausticStrength * underwater;`,
+      )
+  }
+  material.customProgramCacheKey = () => 'pool-floor-caustics'
+}
 
 function enhanceMaterials(scene: Object3D) {
   const done = new Set<Material>()
@@ -53,6 +99,13 @@ function enhanceMaterials(scene: Object3D) {
     if (!look) return
     material.roughness = look.roughness
     material.color.set(look.tint)
+    if ('glow' in look && material.map) {
+      // Pre-lit cards (the tree renders) keep some of their own brightness in shade.
+      material.emissiveMap = material.map
+      material.emissive.set('#ffffff')
+      material.emissiveIntensity = look.glow
+    }
+    if (material.name.includes('PoolFloor')) addCaustics(material)
     if (isFoliage(material)) {
       // Leaves are cut out by alpha and seen from both sides.
       material.transparent = false

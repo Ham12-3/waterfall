@@ -126,13 +126,18 @@ export const CONFIG = {
    * map, and a colour multiplied over the texture. Order matters: the first match wins.
    */
   surfaceLook: {
-    WetTop: { roughness: 0.12, reflect: 1.6, relief: 2.2, tint: '#a7b0b6' },
+    WetTop: { roughness: 0.3, reflect: 1.6, relief: 2.2, tint: '#a9b2b5' },
     Wet: { roughness: 0.28, reflect: 1.3, relief: 2.6, tint: '#c3cace' },
-    DryTop: { roughness: 0.82, reflect: 0.7, relief: 2.6, tint: '#8d8a83' },
+    DryTop: { roughness: 0.9, reflect: 0.7, relief: 2.6, tint: '#c4c0b8' },
     Dry: { roughness: 0.9, reflect: 0.6, relief: 2.8, tint: '#7d7a74' },
     Moss: { roughness: 1.0, reflect: 0.35, relief: 3.2, tint: '#dfe6d2' },
     PoolFloor: { roughness: 0.6, reflect: 0.8, relief: 3.0, tint: '#c9c2b6' },
     Bark: { roughness: 0.75, reflect: 0.6, relief: 3.4, tint: '#e6dccf' },
+    Cliff: { roughness: 0.7, reflect: 0.9, relief: 0, tint: '#d2d8d3' },
+    Rock_Side: { roughness: 0.75, reflect: 0.8, relief: 0, tint: '#ccd2cd' },
+    boulder: { roughness: 0.8, reflect: 0.8, relief: 0, tint: '#e9ecec' },
+    rock_face: { roughness: 0.85, reflect: 0.7, relief: 0, tint: '#dfe2de' },
+    Tree: { roughness: 0.9, reflect: 0.3, relief: 0, tint: '#e8eee0', glow: 0.5 },
     fern: { roughness: 0.7, reflect: 0.5, relief: 0, tint: '#ffffff' },
     anthurium: { roughness: 0.45, reflect: 0.9, relief: 0, tint: '#ffffff' },
   },
@@ -162,6 +167,8 @@ export const CONFIG = {
     /** What the water mirrors where the reflection runs into the cliff. */
     cliffReflection: '#2b3236',
     rippleStrength: 0.11,
+    /** Brightness of the moving light pattern on the pool bed. */
+    caustics: 0.55,
   },
   mist: {
     count: 44,
@@ -197,11 +204,13 @@ export const CONFIG = {
   },
   spray: {
     /** Size of the shared droplet pool. */
-    count: 420,
+    count: 560,
     /** Droplets per second per metre along the base of the fall. */
     baseRate: 14,
     /** Droplets per second at the foot of each water column. */
     columnRate: 26,
+    /** Droplets per second where the fall breaks over each ledge. */
+    ledgeRate: 5,
     gravity: -7,
     /** Air drag per second; high, so spray hangs instead of arcing. */
     drag: 1.6,

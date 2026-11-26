@@ -136,7 +136,7 @@
       "date": "2026-11-26",
       "prompt": "Built procedurally with Python through the MCP for Blender addon. Scripts: assets-src/blender/cascade_lib.py and step1_materials_cliff.py, step2_rocks.py, step3_ground_logs_sheet.py, step4_export.py. Layout comes from assets-src/level_layout.json, which is generated from src/level/greybox.ts.",
       "contents": "Cliff_Main, 14 ledges + 2 stepping stones + 6 boulders as instances of five rock shapes (Rock_A to Rock_E, 1,536 tris each), Summit, Bank_L, Bank_R, Shore, Pool_Basin, Log_A, Log_B, Waterfall_Sheet (UVs top to bottom), and 30 box colliders named <Object>_COL with surface / checkpoint / finish custom properties.",
-      "budget": "88,277 visual triangles including foliage (budget 150,000); textures 1024 px; glb about 1.4 MB with Draco meshes and WebP textures.",
+      "budget": "121,557 visual triangles including foliage, scanned rocks and tree cards (budget 150,000); textures 1024 px; glb about 5.6 MB with Draco meshes and WebP textures.",
       "usedIn": "The whole playable level (src/level/useLevelModel.ts, Level.tsx, Logs.tsx, waterfall/Waterfall.tsx)"
     },
     {
@@ -164,6 +164,33 @@
       "prompt": "No prompt. Downloaded at 1k (.blend) through the Blender MCP addon into a 'Foliage_Source' scene in cascade.blend.",
       "processing": "assets-src/blender/foliage2_place.py scatters 52 linked instances (scaled 3.2x to 5.2x, since the source plants are knee-high) on the banks, outer shore, water's edge, cliff top, summit and the back of mossy ledges. About 42,000 triangles; no colliders.",
       "usedIn": "Level foliage, merged per material at load and excluded from the shadow pass (src/level/useLevelModel.ts)"
+    },
+    {
+      "file": "Poly Haven textures 'Mossy Rock', 'Lichen Rock' and 'Rock Face 03' (CC0) - https://polyhaven.com/a/mossy_rock , https://polyhaven.com/a/lichen_rock , https://polyhaven.com/a/rock_face_03",
+      "gameFile": "public/assets/models/level.glb",
+      "tool": "Poly Haven + Blender",
+      "date": "2026-11-26",
+      "prompt": "No prompt. Downloaded at 1k (colour, roughness, normal) through the Blender MCP addon.",
+      "processing": "assets-src/blender/rocks1_pbr.py: Mossy Rock on the cliff (M_Cliff) and the sides of every ledge (M_Rock_Side), Lichen Rock on wet tops, Rock Face 03 on dry tops. These replace the Flow basalt texture on rock; the Flow moss, pool floor and bark textures are still used.",
+      "usedIn": "Cliff, ledges, stepping stones, summit and banks"
+    },
+    {
+      "file": "Poly Haven models 'Boulder 01' and 'Rock Face 02' (CC0) - https://polyhaven.com/a/boulder_01 , https://polyhaven.com/a/rock_face_02",
+      "gameFile": "public/assets/models/level.glb",
+      "tool": "Poly Haven + Blender",
+      "date": "2026-11-26",
+      "prompt": "No prompt. Downloaded at 1k (.blend) through the Blender MCP addon.",
+      "processing": "assets-src/blender/rocks1_pbr.py: boulder reduced from 66,122 to 1,800 triangles and rock face from 29,566 to 5,200. The boulder replaces the six generated shore boulders and adds six standable rocks in the pool (PoolRock_01..06, wet surface, with colliders); the rock face is used for four outcrops at the foot and top of the cliff.",
+      "usedIn": "Shore boulders, pool rocks and cliff outcrops"
+    },
+    {
+      "file": "assets-src/raw/tree_a_front.png, tree_a_side.png, tree_b_front.png, tree_b_side.png (rendered from Poly Haven 'Tree Small 02' and 'Island Tree 02', CC0 - https://polyhaven.com/a/tree_small_02 , https://polyhaven.com/a/island_tree_02)",
+      "gameFile": "public/assets/models/level.glb",
+      "tool": "Poly Haven + Blender",
+      "date": "2026-11-26",
+      "prompt": "No prompt. The source trees are 2,062,487 and 1,072,213 triangles, so they are not shipped.",
+      "processing": "assets-src/blender/trees1_impostors.py renders each tree from the front and the side in Eevee (orthographic, 1024 px, transparent background, lit by the HDRI) and builds a crossed-card mesh of 4 triangles using the two renders. 24 instances stand along the cliff top, behind the banks and down the outer shore.",
+      "usedIn": "Background trees"
     }
   ]
 }
